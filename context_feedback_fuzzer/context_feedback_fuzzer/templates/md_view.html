@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>📄 Markdown Report Viewer</h2>
+
+  <p class="muted">
+    Trang này dùng để xem Markdown report dưới dạng dễ đọc hơn.
+    Report thể hiện kết quả context-aware và feedback-based fuzzing.
+  </p>
+
+  <p>
+    <b>File:</b>
+    <span class="mono">{{ filename }}</span>
+  </p>
+
+  <div style="margin-top:15px;">
+    <a class="btn secondary" href="{{ url_for('index') }}">
+      ← Quay lại
+    </a>
+
+    <a class="btn good" href="{{ url_for('download_report', filename=filename) }}">
+      ⬇ Tải Markdown
+    </a>
+  </div>
+</div>
+
+
+<div class="card">
+  <h3>Nội dung report</h3>
+
+  <p class="muted">
+    Lưu ý: Các finding trong report là giả thuyết nguy cơ bug dựa trên phản hồi server,
+    không phải xác nhận khai thác thành công và không phải chấm severity.
+  </p>
+
+  <div class="report-md">
+    <pre>{{ content }}</pre>
+  </div>
+</div>
+
+{% endblock %}

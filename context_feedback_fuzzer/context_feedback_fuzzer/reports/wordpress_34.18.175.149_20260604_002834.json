@@ -1,0 +1,128 @@
+{
+  "tool": "Context Feedback Fuzzer v1.2 - authorized testing only",
+  "target": "https://34.18.175.149/",
+  "started_utc": "2026-06-03T17:26:59.698876+00:00",
+  "finished_utc": "2026-06-03T17:28:34.979480+00:00",
+  "detected_cms": "wordpress",
+  "fingerprint_scores": {
+    "wordpress": 0,
+    "joomla": 0,
+    "drupal": 0,
+    "liferay": 0,
+    "sharepoint": 0
+  },
+  "detected_stack": {
+    "language": "unknown",
+    "server": "unknown",
+    "extensions": []
+  },
+  "generated_wordlist_info": {
+    "path_sources": [
+      "wordpress.fuzz.txt",
+      "wp-plugins.fuzz.txt",
+      "wp-themes.fuzz.txt",
+      "urls-wordpress-3.3.1.txt"
+    ],
+    "server_extensions": [],
+    "parameter_strategy": {
+      "p": "numeric",
+      "page_id": "numeric",
+      "cat": "numeric",
+      "search": "text",
+      "s": "text",
+      "author": "numeric",
+      "action": "action",
+      "nonce": "generic",
+      "redirect_to": "redirect",
+      "log": "text",
+      "pwd": "generic"
+    },
+    "payload_strategy": {
+      "p": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "page_id": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "cat": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "search": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "sqli_probe"
+      ],
+      "s": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "sqli_probe"
+      ],
+      "author": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "action": [
+        "action_canary",
+        "text_canary",
+        "sqli_probe"
+      ],
+      "nonce": [
+        "generic_canary",
+        "generic_bool",
+        "generic_number",
+        "sqli_probe"
+      ],
+      "redirect_to": [
+        "redirect_probe",
+        "redirect_probe"
+      ],
+      "log": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "xss_reflection_probe",
+        "sqli_probe"
+      ],
+      "pwd": [
+        "generic_canary",
+        "generic_bool",
+        "generic_number",
+        "sqli_probe"
+      ]
+    }
+  },
+  "requests_sent": 337,
+  "safety": {
+    "authorization_required": true,
+    "methods": [
+      "GET"
+    ],
+    "max_requests": 400,
+    "delay_seconds": 0.15,
+    "scope_host": "34.18.175.149"
+  },
+  "findings": []
+}

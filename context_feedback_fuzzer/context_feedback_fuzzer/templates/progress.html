@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>🚀 Đang chạy Context Feedback Fuzzer</h2>
+
+  <p class="muted">
+    Tool đang thực hiện quy trình context-aware và feedback-based fuzzing.
+  </p>
+
+  <ol class="step-list">
+    <li>Fingerprint platform: CMS, LMS, Portal hoặc SharePoint</li>
+    <li>Xây dựng wordlist theo ngữ cảnh platform</li>
+    <li>Fuzzing path và parameter bằng canary payload an toàn</li>
+    <li>Phân tích phản hồi server để suy luận nguy cơ bug</li>
+    <li>Tạo JSON report và Markdown report</li>
+  </ol>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar">0%</div>
+  </div>
+
+  <div class="status-box">
+    <p>
+      <b>Trạng thái hiện tại:</b>
+    </p>
+
+    <p id="stepText" class="muted">
+      Đang khởi tạo...
+    </p>
+  </div>
+</div>
+
+
+<div class="card">
+  <h3>Thông tin</h3>
+
+  <p class="muted">
+    Vui lòng không đóng trình duyệt trong khi scan đang chạy.
+  </p>
+
+  <p class="muted">
+    Sau khi hoàn tất, hệ thống sẽ tự động chuyển tới trang kết quả.
+  </p>
+
+  <p class="muted">
+    Lưu ý: Tool chỉ dùng phương thức GET, giới hạn cùng host và yêu cầu xác nhận quyền kiểm thử.
+  </p>
+</div>
+
+
+<script>
+const jobId = "{{ job_id }}";
+
+async function updateProgress() {
+    try {
+        const response = await fetch(`/scan/progress/${jobId}`);
+        const data = await response.json();
+
+        const progressBar = document.getElementById("progressBar");
+        const stepText = document.getElementById("stepText");
+
+        const progress = data.progress || 0;
+
+        progressBar.style.width = progress + "%";
+        progressBar.innerText = progress + "%";
+        stepText.innerText = data.step || "Đang xử lý...";
+
+        if (data.status === "done") {
+            window.location.href = `/scan/result/${jobId}`;
+            return;
+        }
+
+        if (data.status === "error") {
+            stepText.innerText =
+                "❌ Scan bị lỗi: " + (data.error || "Unknown error");
+
+            progressBar.style.background = "#dc2626";
+            return;
+        }
+
+        setTimeout(updateProgress, 1000);
+
+    } catch (err) {
+        document.getElementById("stepText").innerText =
+            "❌ Không thể lấy trạng thái scan";
+    }
+}
+
+updateProgress();
+</script>
+
+{% endblock %}

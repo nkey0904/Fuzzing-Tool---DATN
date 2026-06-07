@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+  <h2>Kết quả scan</h2>
+
+  <div class="grid">
+    <div class="status-box">
+      <p class="muted">Target</p>
+      <p class="mono small">{{ summary.target }}</p>
+    </div>
+
+    <div class="status-box">
+      <p class="muted">Detected Platform</p>
+      <p>
+        <span class="badge">
+          {{ summary.detected_platform or summary.detected_cms }}
+        </span>
+      </p>
+    </div>
+
+    <div class="status-box">
+      <p class="muted">Platform Type</p>
+      <p>
+        <span class="badge">
+          {{ summary.platform_type or result.platform_type or "Web Platform" }}
+        </span>
+      </p>
+    </div>
+
+    <div class="status-box">
+      <p class="muted">Requests sent</p>
+      <p><b>{{ summary.requests_sent }}</b></p>
+    </div>
+
+    <div class="status-box">
+      <p class="muted">Findings</p>
+      <p><span class="badge">{{ summary.findings_count }}</span></p>
+    </div>
+  </div>
+
+  {% if result.detected_stack %}
+  <p>
+    <b>Server technology hint:</b>
+    <span class="badge">{{ result.detected_stack.language }}</span>
+    /
+    <span class="badge">{{ result.detected_stack.server }}</span>
+  </p>
+  {% endif %}
+
+  <p class="muted">
+    Tool chỉ đưa ra giả thuyết nguy cơ bug dựa trên phản hồi server sau khi fuzzing.
+    Kết quả không phải xác nhận khai thác thành công và không phải đánh giá severity High/Medium/Low.
+  </p>
+
+  <p>
+    <a class="btn good" href="{{ url_for('download_report', filename=summary.md_file) }}">
+      Tải Markdown report
+    </a>
+
+    <a class="btn secondary" href="{{ url_for('view_report', filename=summary.md_file) }}">
+      Xem Markdown
+    </a>
+
+    <a class="btn" href="{{ url_for('download_report', filename=summary.json_file) }}">
+      Tải JSON report
+    </a>
+
+    <a class="btn secondary" href="{{ url_for('index') }}">
+      Scan target khác
+    </a>
+  </p>
+</div>
+
+
+<div class="card">
+  <h2>Cơ chế tạo wordlist</h2>
+
+  <p class="muted">
+    Đây là phần giải thích tool tạo wordlist như thế nào.
+    Tool không dùng một danh sách cố định cho mọi website, mà tạo wordlist theo ngữ cảnh platform.
+  </p>
+
+  <table class="table">
+    <tr>
+      <th>Lớp wordlist</th>
+      <th>Cách tạo</th>
+      <th>Ý nghĩa</th>
+    </tr>
+
+    <tr>
+      <td><b>1. Platform path wordlist</b></td>
+      <td class="mono small">
+        {{ result.generated_wordlist_info.path_sources|join(', ') }}
+      </td>
+      <td>
+        Nếu detect WordPress/Joomla/Drupal thì dùng wordlist CMS tương ứng.
+        Nếu detect Moodle thì dùng wordlist LMS Moodle.
+        Nếu detect Liferay/SharePoint thì dùng wordlist platform tương ứng.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>2. Server extension wordlist</b></td>
+      <td class="mono small">
+        {{ result.generated_wordlist_info.server_extensions|join(', ') if result.generated_wordlist_info.server_extensions else 'none' }}
+      </td>
+      <td>
+        Nếu server gợi ý PHP thì ưu tiên <span class="mono">.php</span>.
+        Nếu Java thì ưu tiên <span class="mono">.jsp/.do/.action</span>.
+        Nếu ASP.NET thì ưu tiên <span class="mono">.aspx/.ashx/.asmx</span>.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>3. Parameter value wordlist</b></td>
+      <td class="mono small">
+        {% for k, v in result.generated_wordlist_info.parameter_strategy.items() %}
+          {{ k }} → {{ v }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        Tool phân loại parameter như numeric, text, path, redirect, token,
+        rồi sinh payload value tương ứng để fuzzing XSS, SQLi,
+        path handling, redirect behavior hoặc token/input handling.
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+<div class="card">
+  <h2>Payload strategy preview</h2>
+
+  <p class="muted">
+    Bảng này cho thấy tool đã phân loại parameter và chọn nhóm payload nào để fuzz.
+    Đây là phần trả lời câu hỏi: “fuzzing cái gì trên những chỗ đó?”.
+  </p>
+
+  {% if result.generated_wordlist_info.payload_strategy %}
+  <table class="table">
+    <tr>
+      <th>Parameter</th>
+      <th>Param type</th>
+      <th>Payload groups</th>
+    </tr>
+
+    {% for param, payloads in result.generated_wordlist_info.payload_strategy.items() %}
+    <tr>
+      <td class="mono">{{ param }}</td>
+      <td>
+        <span class="badge">
+          {{ result.generated_wordlist_info.parameter_strategy.get(param, 'unknown') }}
+        </span>
+      </td>
+      <td class="mono small">
+        {{ payloads|join(', ') }}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p class="muted">Chưa có dữ liệu payload strategy.</p>
+  {% endif %}
+</div>
+
+
+<div class="card">
+  <h2>Fingerprint scores</h2>
+
+  <p class="muted">
+    Điểm fingerprint chỉ dùng để chọn ngữ cảnh platform phù hợp,
+    không phải điểm rủi ro bảo mật.
+  </p>
+
+  <table class="table">
+    <tr>
+      <th>Platform</th>
+      <th>Fingerprint score</th>
+    </tr>
+
+    {% for k, v in result.fingerprint_scores.items() %}
+    <tr>
+      <td>{{ k }}</td>
+      <td>{{ v }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+
+<div class="card">
+  <h2>Findings</h2>
+
+  <p class="muted">
+    Các finding dưới đây là giả thuyết nguy cơ bug dựa trên phản hồi của server sau khi fuzzing.
+    Tool không khẳng định website có lỗ hổng, mà chỉ ghi nhận dấu hiệu bất thường cần kiểm tra tiếp.
+  </p>
+
+  {% if not result.findings %}
+    <p class="muted">
+      Không phát hiện dấu hiệu bất thường đáng kể.
+    </p>
+  {% endif %}
+
+  {% for f in result.findings[:80] %}
+  <details>
+    <summary>
+      #{{ loop.index }}
+      |
+      HTTP {{ f.status }}
+      |
+      {{ f.bug_hypothesis or f.vulnerability_type or f.kind }}
+    </summary>
+
+    <div class="status-box">
+      <p>
+        <b>Kết luận nguy cơ:</b>
+        {{ f.conclusion or ("Có dấu hiệu/nguy cơ: " ~ (f.vulnerability_type or f.kind)) }}
+      </p>
+
+      <p>
+        <b>URL:</b>
+        <span class="mono small">{{ f.url }}</span>
+      </p>
+
+      {% if f.parameter %}
+      <p>
+        <b>Parameter:</b>
+        <span class="badge">{{ f.parameter }}</span>
+        |
+        <b>Param type:</b>
+        {{ f.param_type }}
+      </p>
+
+      <p>
+        <b>Payload type:</b>
+        {{ f.payload_type }}
+        |
+        <b>Payload:</b>
+        <span class="mono small">{{ f.payload }}</span>
+      </p>
+      {% endif %}
+
+      <p>
+        <b>Response:</b>
+        HTTP {{ f.status }}
+        |
+        <b>Content-Type:</b>
+        {{ f.content_type }}
+        |
+        <b>Length:</b>
+        {{ f.length }}
+      </p>
+
+      {% if f.title %}
+      <p>
+        <b>Title:</b>
+        {{ f.title }}
+      </p>
+      {% endif %}
+
+      {% if f.evidence or f.evidence_summary %}
+      <p>
+        <b>Evidence:</b>
+        {{ f.evidence_summary or f.evidence }}
+      </p>
+      {% endif %}
+
+      {% if f.research_note %}
+      <p>
+        <b>Research note:</b>
+        {{ f.research_note }}
+      </p>
+      {% endif %}
+
+      <p>
+        <b>Reason:</b>
+        {{ f.reason }}
+      </p>
+    </div>
+  </details>
+  {% endfor %}
+</div>
+
+{% endblock %}

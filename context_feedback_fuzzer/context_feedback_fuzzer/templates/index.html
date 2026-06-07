@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>Chạy scan</h2>
+
+  <p class="muted">
+    Nhập target, chọn platform hoặc để auto, sau đó bấm bắt đầu fuzzing.
+    Tool sẽ chuyển sang màn hình tiến độ để hiển thị quá trình scan.
+  </p>
+
+  <form method="post" action="{{ url_for('scan_start') }}">
+    <div class="grid">
+      <div>
+        <label>Target URL</label>
+        <input
+          name="target"
+          placeholder="http://127.0.0.1:8080 hoặc https://example.com"
+          required
+        >
+      </div>
+
+      <div>
+        <label>Platform</label>
+        <select name="platform">
+          {% for c in platform_options %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Threads</label>
+        <input name="threads" value="4">
+      </div>
+
+      <div>
+        <label>Delay / request</label>
+        <input name="delay" value="0.15">
+      </div>
+
+      <div>
+        <label>Timeout</label>
+        <input name="timeout" value="8">
+      </div>
+
+      <div>
+        <label>Max requests</label>
+        <input name="max_requests" value="400">
+      </div>
+    </div>
+
+    <p>
+      <label>
+        <input type="checkbox" name="authorization" style="width:auto">
+        Tôi xác nhận target thuộc lab hoặc đã được phép kiểm thử
+      </label>
+    </p>
+
+    <button type="submit">
+      Bắt đầu fuzzing
+    </button>
+  </form>
+</div>
+
+
+<div class="card">
+  <h2>Luồng xử lý của tool</h2>
+
+  <table class="table">
+    <tr>
+      <th>Bước</th>
+      <th>Mô tả</th>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td>Fingerprint platform và server technology</td>
+    </tr>
+
+    <tr>
+      <td>2</td>
+      <td>Tạo wordlist theo ngữ cảnh platform, server extension và parameter type</td>
+    </tr>
+
+    <tr>
+      <td>3</td>
+      <td>Fuzzing path và parameter bằng canary payload an toàn</td>
+    </tr>
+
+    <tr>
+      <td>4</td>
+      <td>Phân tích phản hồi server để kết luận nguy cơ bug</td>
+    </tr>
+
+    <tr>
+      <td>5</td>
+      <td>Sinh JSON report và Markdown report</td>
+    </tr>
+  </table>
+</div>
+
+
+<div class="card">
+  <h2>Các loại platform đang hỗ trợ</h2>
+
+  <table class="table">
+    <tr>
+      <th>Platform</th>
+      <th>Loại</th>
+      <th>Ý nghĩa</th>
+    </tr>
+
+    <tr>
+      <td>WordPress / Joomla / Drupal</td>
+      <td>CMS</td>
+      <td>Quản trị nội dung website</td>
+    </tr>
+
+    <tr>
+      <td>Moodle</td>
+      <td>LMS</td>
+      <td>Quản trị học tập trực tuyến, khóa học, quiz, bài tập, sinh viên</td>
+    </tr>
+
+    <tr>
+      <td>Liferay</td>
+      <td>Portal / DXP</td>
+      <td>Nền tảng cổng thông tin doanh nghiệp</td>
+    </tr>
+
+    <tr>
+      <td>SharePoint</td>
+      <td>Collaboration Platform</td>
+      <td>Nền tảng cộng tác, tài liệu, site nội bộ</td>
+    </tr>
+  </table>
+</div>
+
+
+<div class="card">
+  <h2>Report gần đây</h2>
+
+  {% if not reports %}
+    <p class="muted">Chưa có report.</p>
+  {% endif %}
+
+  {% if reports %}
+  <table class="table">
+    <tr>
+      <th>Target</th>
+      <th>Platform</th>
+      <th>Type</th>
+      <th>Requests</th>
+      <th>Findings</th>
+      <th>File</th>
+    </tr>
+
+    {% for r in reports %}
+    <tr>
+      <td class="mono small">{{ r.target }}</td>
+      <td>{{ r.platform or r.cms }}</td>
+      <td>{{ r.platform_type or "Web Platform" }}</td>
+      <td>{{ r.requests }}</td>
+      <td>
+        <span class="badge">{{ r.findings }}</span>
+      </td>
+      <td>
+        <a
+          class="btn secondary small"
+          href="{{ url_for('view_report', filename=r.md) }}"
+        >
+          Xem MD
+        </a>
+
+        <a
+          class="btn secondary small"
+          href="{{ url_for('download_report', filename=r.json) }}"
+        >
+          Tải JSON
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}
