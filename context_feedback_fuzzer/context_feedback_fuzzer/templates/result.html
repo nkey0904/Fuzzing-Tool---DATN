@@ -1,287 +1,658 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Scan Result · Context Feedback Fuzzer{% endblock %} {%
+block content %} {% set platform = summary.detected_platform or summary.detected_cms %} {% set stack
+= result.detected_stack or {} %} {% set word = result.generated_wordlist_info or {} %} {% set marker
+= result.marker_based_fuzzing or {} %} {% set confirmation = result.confirmation_summary or {} %} {%
+set confirmed_count = summary.confirmed_findings_count or result.confirmed_findings_count or
+confirmation.confirmed_findings_count or 0 %} {% set possible_count =
+summary.possible_findings_count or result.possible_findings_count or
+confirmation.possible_findings_count or 0 %} {% set confirmation_rate = summary.confirmation_rate or
+result.confirmation_rate or confirmation.confirmation_rate or 0 %} {% set marker_verified =
+summary.marker_verified_count or result.marker_verified_count or confirmation.marker_verified_count
+or 0 %} {% set markers_generated = summary.markers_generated or marker.markers_generated or 0 %} {%
+set markers_failed = summary.markers_failed or result.markers_failed or confirmation.markers_failed
+or 0 %} {% set marker_rate = summary.marker_verification_rate or result.marker_verification_rate or
+confirmation.marker_verification_rate or 0 %} {% set crawled_links = summary.crawled_links_count or
+result.crawled_links_count or confirmation.crawled_links_count or 0 %} {% set total_findings =
+summary.findings_count or result.findings|length %}
 
-{% block content %}
-
-<div class="card">
-  <h2>Kết quả scan</h2>
-
-  <div class="grid">
-    <div class="status-box">
-      <p class="muted">Target</p>
-      <p class="mono small">{{ summary.target }}</p>
-    </div>
-
-    <div class="status-box">
-      <p class="muted">Detected Platform</p>
-      <p>
-        <span class="badge">
-          {{ summary.detected_platform or summary.detected_cms }}
-        </span>
-      </p>
-    </div>
-
-    <div class="status-box">
-      <p class="muted">Platform Type</p>
-      <p>
-        <span class="badge">
-          {{ summary.platform_type or result.platform_type or "Web Platform" }}
-        </span>
-      </p>
-    </div>
-
-    <div class="status-box">
-      <p class="muted">Requests sent</p>
-      <p><b>{{ summary.requests_sent }}</b></p>
-    </div>
-
-    <div class="status-box">
-      <p class="muted">Findings</p>
-      <p><span class="badge">{{ summary.findings_count }}</span></p>
+<div class="row g-3 mb-4">
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex gap-3">
+        <div class="stat-icon"><i class="ti ti-world fs-2"></i></div>
+        <div>
+          <div class="text-muted-custom small">Target</div>
+          <div class="fw-bold mono small text-break">{{ summary.target }}</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  {% if result.detected_stack %}
-  <p>
-    <b>Server technology hint:</b>
-    <span class="badge">{{ result.detected_stack.language }}</span>
-    /
-    <span class="badge">{{ result.detected_stack.server }}</span>
-  </p>
-  {% endif %}
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex gap-3">
+        <div class="stat-icon purple"><i class="ti ti-stack-2 fs-2"></i></div>
+        <div>
+          <div class="text-muted-custom small">Detected Platform</div>
+          <div class="h3 mb-0">{{ platform }}</div>
+          <span class="badge badge-soft-blue"
+            >{{ summary.platform_type or result.platform_type or 'Web Platform' }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <p class="muted">
-    Tool chỉ đưa ra giả thuyết nguy cơ bug dựa trên phản hồi server sau khi fuzzing.
-    Kết quả không phải xác nhận khai thác thành công và không phải đánh giá severity High/Medium/Low.
-  </p>
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex gap-3">
+        <div class="stat-icon green"><i class="ti ti-shield-check fs-2"></i></div>
+        <div>
+          <div class="text-muted-custom small">Confirmed</div>
+          <div class="h2 mb-0">{{ confirmed_count }}</div>
+          <span class="badge badge-soft-green">Bug confirmation</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <p>
-    <a class="btn good" href="{{ url_for('download_report', filename=summary.md_file) }}">
-      Tải Markdown report
-    </a>
-
-    <a class="btn secondary" href="{{ url_for('view_report', filename=summary.md_file) }}">
-      Xem Markdown
-    </a>
-
-    <a class="btn" href="{{ url_for('download_report', filename=summary.json_file) }}">
-      Tải JSON report
-    </a>
-
-    <a class="btn secondary" href="{{ url_for('index') }}">
-      Scan target khác
-    </a>
-  </p>
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex gap-3">
+        <div class="stat-icon yellow"><i class="ti ti-alert-triangle fs-2"></i></div>
+        <div>
+          <div class="text-muted-custom small">Possible</div>
+          <div class="h2 mb-0">{{ possible_count }}</div>
+          <span class="badge badge-soft-yellow">Feedback/anomaly</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-<div class="card">
-  <h2>Cơ chế tạo wordlist</h2>
-
-  <p class="muted">
-    Đây là phần giải thích tool tạo wordlist như thế nào.
-    Tool không dùng một danh sách cố định cho mọi website, mà tạo wordlist theo ngữ cảnh platform.
-  </p>
-
-  <table class="table">
-    <tr>
-      <th>Lớp wordlist</th>
-      <th>Cách tạo</th>
-      <th>Ý nghĩa</th>
-    </tr>
-
-    <tr>
-      <td><b>1. Platform path wordlist</b></td>
-      <td class="mono small">
-        {{ result.generated_wordlist_info.path_sources|join(', ') }}
-      </td>
-      <td>
-        Nếu detect WordPress/Joomla/Drupal thì dùng wordlist CMS tương ứng.
-        Nếu detect Moodle thì dùng wordlist LMS Moodle.
-        Nếu detect Liferay/SharePoint thì dùng wordlist platform tương ứng.
-      </td>
-    </tr>
-
-    <tr>
-      <td><b>2. Server extension wordlist</b></td>
-      <td class="mono small">
-        {{ result.generated_wordlist_info.server_extensions|join(', ') if result.generated_wordlist_info.server_extensions else 'none' }}
-      </td>
-      <td>
-        Nếu server gợi ý PHP thì ưu tiên <span class="mono">.php</span>.
-        Nếu Java thì ưu tiên <span class="mono">.jsp/.do/.action</span>.
-        Nếu ASP.NET thì ưu tiên <span class="mono">.aspx/.ashx/.asmx</span>.
-      </td>
-    </tr>
-
-    <tr>
-      <td><b>3. Parameter value wordlist</b></td>
-      <td class="mono small">
-        {% for k, v in result.generated_wordlist_info.parameter_strategy.items() %}
-          {{ k }} → {{ v }}{% if not loop.last %}, {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        Tool phân loại parameter như numeric, text, path, redirect, token,
-        rồi sinh payload value tương ứng để fuzzing XSS, SQLi,
-        path handling, redirect behavior hoặc token/input handling.
-      </td>
-    </tr>
-  </table>
-</div>
-
-
-<div class="card">
-  <h2>Payload strategy preview</h2>
-
-  <p class="muted">
-    Bảng này cho thấy tool đã phân loại parameter và chọn nhóm payload nào để fuzz.
-    Đây là phần trả lời câu hỏi: “fuzzing cái gì trên những chỗ đó?”.
-  </p>
-
-  {% if result.generated_wordlist_info.payload_strategy %}
-  <table class="table">
-    <tr>
-      <th>Parameter</th>
-      <th>Param type</th>
-      <th>Payload groups</th>
-    </tr>
-
-    {% for param, payloads in result.generated_wordlist_info.payload_strategy.items() %}
-    <tr>
-      <td class="mono">{{ param }}</td>
-      <td>
-        <span class="badge">
-          {{ result.generated_wordlist_info.parameter_strategy.get(param, 'unknown') }}
-        </span>
-      </td>
-      <td class="mono small">
-        {{ payloads|join(', ') }}
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}
-    <p class="muted">Chưa có dữ liệu payload strategy.</p>
-  {% endif %}
-</div>
-
-
-<div class="card">
-  <h2>Fingerprint scores</h2>
-
-  <p class="muted">
-    Điểm fingerprint chỉ dùng để chọn ngữ cảnh platform phù hợp,
-    không phải điểm rủi ro bảo mật.
-  </p>
-
-  <table class="table">
-    <tr>
-      <th>Platform</th>
-      <th>Fingerprint score</th>
-    </tr>
-
-    {% for k, v in result.fingerprint_scores.items() %}
-    <tr>
-      <td>{{ k }}</td>
-      <td>{{ v }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-
-
-<div class="card">
-  <h2>Findings</h2>
-
-  <p class="muted">
-    Các finding dưới đây là giả thuyết nguy cơ bug dựa trên phản hồi của server sau khi fuzzing.
-    Tool không khẳng định website có lỗ hổng, mà chỉ ghi nhận dấu hiệu bất thường cần kiểm tra tiếp.
-  </p>
-
-  {% if not result.findings %}
-    <p class="muted">
-      Không phát hiện dấu hiệu bất thường đáng kể.
-    </p>
-  {% endif %}
-
-  {% for f in result.findings[:80] %}
-  <details>
-    <summary>
-      #{{ loop.index }}
-      |
-      HTTP {{ f.status }}
-      |
-      {{ f.bug_hypothesis or f.vulnerability_type or f.kind }}
-    </summary>
-
-    <div class="status-box">
-      <p>
-        <b>Kết luận nguy cơ:</b>
-        {{ f.conclusion or ("Có dấu hiệu/nguy cơ: " ~ (f.vulnerability_type or f.kind)) }}
-      </p>
-
-      <p>
-        <b>URL:</b>
-        <span class="mono small">{{ f.url }}</span>
-      </p>
-
-      {% if f.parameter %}
-      <p>
-        <b>Parameter:</b>
-        <span class="badge">{{ f.parameter }}</span>
-        |
-        <b>Param type:</b>
-        {{ f.param_type }}
-      </p>
-
-      <p>
-        <b>Payload type:</b>
-        {{ f.payload_type }}
-        |
-        <b>Payload:</b>
-        <span class="mono small">{{ f.payload }}</span>
-      </p>
-      {% endif %}
-
-      <p>
-        <b>Response:</b>
-        HTTP {{ f.status }}
-        |
-        <b>Content-Type:</b>
-        {{ f.content_type }}
-        |
-        <b>Length:</b>
-        {{ f.length }}
-      </p>
-
-      {% if f.title %}
-      <p>
-        <b>Title:</b>
-        {{ f.title }}
-      </p>
-      {% endif %}
-
-      {% if f.evidence or f.evidence_summary %}
-      <p>
-        <b>Evidence:</b>
-        {{ f.evidence_summary or f.evidence }}
-      </p>
-      {% endif %}
-
-      {% if f.research_note %}
-      <p>
-        <b>Research note:</b>
-        {{ f.research_note }}
-      </p>
-      {% endif %}
-
-      <p>
-        <b>Reason:</b>
-        {{ f.reason }}
+<div class="glass-card p-4 mb-4">
+  <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+    <div>
+      <div class="badge badge-soft-green mb-2">
+        <i class="ti ti-checkup-list me-1"></i> Scan result v2.1
+      </div>
+      <h2 class="mb-1">Kết quả scan</h2>
+      <p class="text-muted-custom mb-0">
+        Tool phân loại finding theo <b>confirmed</b> hoặc <b>possible</b>. Confirmed nghĩa là có
+        bằng chứng marker reflection/verification, còn possible là dựa trên feedback/anomaly.
       </p>
     </div>
-  </details>
-  {% endfor %}
+
+    <div class="d-flex gap-2 flex-wrap">
+      <a
+        class="btn btn-cff-success"
+        href="{{ url_for('download_report', filename=summary.md_file) }}"
+      >
+        <i class="ti ti-markdown me-1"></i>Tải Markdown
+      </a>
+      <a
+        class="btn btn-outline-light"
+        href="{{ url_for('view_report', filename=summary.md_file) }}"
+      >
+        <i class="ti ti-eye me-1"></i>Xem report
+      </a>
+      <a
+        class="btn btn-outline-info"
+        href="{{ url_for('download_report', filename=summary.json_file) }}"
+      >
+        <i class="ti ti-json me-1"></i>Tải JSON
+      </a>
+      <a class="btn btn-outline-light" href="{{ url_for('index') }}">
+        <i class="ti ti-plus me-1"></i>Scan khác
+      </a>
+    </div>
+  </div>
 </div>
 
+<div class="metric-grid mb-4">
+  <div class="metric-card">
+    <div class="metric-label">Requests sent</div>
+    <div class="metric-value">{{ summary.requests_sent }}</div>
+    <div class="small text-muted-custom">GET-only, same-host</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-label">Total findings</div>
+    <div class="metric-value">{{ total_findings }}</div>
+    <div class="small text-muted-custom">Confirmed + possible</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-label">Marker verified</div>
+    <div class="metric-value text-info">{{ marker_verified }}</div>
+    <div class="small text-muted-custom">{{ markers_generated }} generated</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-label">Crawled links</div>
+    <div class="metric-value">{{ crawled_links }}</div>
+    <div class="small text-muted-custom">Verification pages</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-5">
+    <div class="glass-card p-4 h-100 chart-card">
+      <h2 class="mb-3"><i class="ti ti-chart-donut me-2"></i>Confirmation overview</h2>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="soft-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="confirmation-pill confirmation-confirmed">
+                <i class="ti ti-shield-check"></i> CONFIRMED
+              </span>
+              <span class="h2 mb-0 text-success">{{ confirmed_count }}</span>
+            </div>
+            <div class="text-muted-custom small mb-2">
+              Có marker hoặc verification evidence hỗ trợ.
+            </div>
+            <div class="progress" style="height: 10px">
+              <div
+                class="progress-bar progress-bar-confirmed"
+                style="width: {{ confirmation_rate }}%;"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="soft-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="confirmation-pill confirmation-possible">
+                <i class="ti ti-alert-triangle"></i> POSSIBLE
+              </span>
+              <span class="h2 mb-0 text-warning">{{ possible_count }}</span>
+            </div>
+            <div class="text-muted-custom small mb-2">
+              Dựa trên feedback/anomaly, cần kiểm tra thủ công thêm.
+            </div>
+            <div class="progress" style="height: 10px">
+              <div
+                class="progress-bar progress-bar-possible"
+                style="width: {{ 100 - confirmation_rate if total_findings else 0 }}%;"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="soft-card p-3 mt-3">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted-custom">Confirmation rate</span>
+          <b>{{ confirmation_rate }}%</b>
+        </div>
+        <div class="progress mb-3" style="height: 10px">
+          <div
+            class="progress-bar progress-bar-confirmed"
+            style="width: {{ confirmation_rate }}%;"
+          ></div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted-custom">Marker verification rate</span>
+          <b>{{ marker_rate }}%</b>
+        </div>
+        <div class="progress" style="height: 10px">
+          <div class="progress-bar progress-bar-marker" style="width: {{ marker_rate }}%;"></div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap mt-3">
+        <span class="badge badge-soft-blue">Generated: {{ markers_generated }}</span>
+        <span class="badge badge-soft-cyan">Verified: {{ marker_verified }}</span>
+        <span class="badge badge-soft-gray">Failed: {{ markers_failed }}</span>
+        <span class="badge badge-soft-purple">Crawled: {{ crawled_links }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-7">
+    <div class="glass-card p-4 h-100 chart-card">
+      <h2 class="mb-3"><i class="ti ti-fingerprint me-2"></i>Fingerprint scores</h2>
+      <canvas id="fingerprintChart" height="180"></canvas>
+      <p class="text-muted-custom mt-3 mb-0">
+        Điểm fingerprint chỉ dùng để chọn ngữ cảnh platform phù hợp, không phải điểm rủi ro bảo mật.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-xl-6">
+    <div class="glass-card p-4 h-100">
+      <div class="badge badge-soft-purple mb-2">
+        <i class="ti ti-list-search me-1"></i>Context-aware wordlist
+      </div>
+      <h2 class="mb-3">Cơ chế tạo wordlist</h2>
+
+      <div class="soft-card p-3 mb-3">
+        <div class="text-muted-custom small">Path wordlist sources</div>
+        <div class="mono small text-break">
+          {{ word.path_sources|join(', ') if word.path_sources else 'profile defaults' }}
+        </div>
+      </div>
+
+      <div class="soft-card p-3 mb-3">
+        <div class="text-muted-custom small">Server extension priority</div>
+        <div class="mono small">
+          {{ word.server_extensions|join(', ') if word.server_extensions else 'none' }}
+        </div>
+      </div>
+
+      <div class="soft-card p-3">
+        <div class="text-muted-custom small mb-2">Parameter strategy examples</div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for k, v in word.parameter_strategy.items() %} {% if loop.index <= 26 %}
+          <span class="badge badge-soft-blue mono">{{ k }} → {{ v }}</span>
+          {% endif %} {% endfor %} {% if not word.parameter_strategy %}
+          <span class="text-muted-custom">Chưa có dữ liệu.</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6">
+    <div class="glass-card p-4 h-100">
+      <div class="badge badge-soft-yellow mb-2">
+        <i class="ti ti-flask me-1"></i>Payload strategy
+      </div>
+      <h2 class="mb-3">Fuzzing cái gì?</h2>
+
+      <div class="table-responsive table-scroll">
+        <table class="table table-vcenter">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Payload groups</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for param, payloads in word.payload_strategy.items() %}
+            <tr>
+              <td class="mono">{{ param }}</td>
+              <td>
+                <span class="badge badge-soft-blue"
+                  >{{ word.parameter_strategy.get(param, 'unknown') }}</span
+                >
+              </td>
+              <td class="mono small">{{ payloads|join(', ') }}</td>
+            </tr>
+            {% endfor %} {% if not word.payload_strategy %}
+            <tr>
+              <td colspan="3" class="text-muted-custom">Chưa có dữ liệu payload strategy.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card p-4 mt-4">
+  <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
+    <div>
+      <h2 class="mb-1"><i class="ti ti-bug me-2"></i>Findings</h2>
+      <p class="text-muted-custom mb-0">
+        Có thể lọc theo confirmation, loại finding và tìm kiếm URL/parameter/marker/evidence.
+      </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <input
+        id="findingSearch"
+        class="form-control"
+        style="min-width: 260px"
+        placeholder="Tìm URL, param, marker, evidence..."
+      />
+
+      <select id="confirmationFilter" class="form-select" style="min-width: 180px">
+        <option value="all">Tất cả trạng thái</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="possible">Possible</option>
+      </select>
+
+      <select id="findingFilter" class="form-select" style="min-width: 180px">
+        <option value="all">Tất cả loại finding</option>
+        <option value="sqli">SQL-like</option>
+        <option value="xss">Reflection/XSS</option>
+        <option value="redirect">Redirect</option>
+        <option value="path">Path/Input</option>
+        <option value="error">Error feedback</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+  </div>
+
+  {% if not result.findings %}
+  <div class="soft-card p-4 text-center text-muted-custom">
+    Không phát hiện dấu hiệu bất thường đáng kể.
+  </div>
+  {% endif %}
+
+  <div id="findingsList" class="row g-3">
+    {% for f in result.findings %} {% set ft = (f.vulnerability_type or f.kind or '')|lower %} {%
+    set reason_text = (f.reason or '')|lower %} {% set cls = 'sqli' if 'sql' in ft or 'sql' in
+    reason_text else ('xss' if 'xss' in ft or 'reflection' in ft or 'reflection' in reason_text else
+    ('redirect' if 'redirect' in ft or 'redirect' in reason_text else ('path' if 'path' in ft or
+    'path' in reason_text else ('error' if 'error' in ft or 'error' in reason_text else 'other'))))
+    %} {% set confirm = f.confirmation or 'possible' %} {% set level = f.confirmation_level or
+    confirm %} {% set confidence = f.confidence or 0 %} {% set marker_hits_count =
+    (f.marker_hits|length) if f.marker_hits else 0 %}
+
+    <div
+      class="col-12 finding-item"
+      data-index="{{ loop.index }}"
+      data-type="{{ cls }}"
+      data-confirmation="{{ confirm }}"
+      data-search="{{ (f.url ~ ' ' ~ (f.parameter or '') ~ ' ' ~ (f.vulnerability_type or '') ~ ' ' ~ (f.kind or '') ~ ' ' ~ (f.reason or '') ~ ' ' ~ (f.evidence or '') ~ ' ' ~ (f.evidence_summary or '') ~ ' ' ~ (f.marker or ''))|lower }}"
+    >
+      <div class="soft-card finding-card {{ confirm }} {{ cls }} p-3">
+        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="badge badge-soft-blue">#{{ loop.index }}</span>
+              <span class="badge badge-soft-blue">HTTP {{ f.status }}</span>
+
+              {% if confirm == 'confirmed' %}
+              <span class="confirmation-pill confirmation-confirmed">
+                <i class="ti ti-shield-check"></i>CONFIRMED
+              </span>
+              {% else %}
+              <span class="confirmation-pill confirmation-possible">
+                <i class="ti ti-alert-triangle"></i>POSSIBLE
+              </span>
+              {% endif %}
+
+              <span class="badge badge-soft-purple">{{ level }}</span>
+              <span class="badge badge-soft-cyan">{{ cls }}</span>
+
+              {% if f.parameter %}
+              <span class="badge badge-soft-purple">param: {{ f.parameter }}</span>
+              {% endif %}
+            </div>
+
+            <h3 class="mb-1">{{ f.bug_hypothesis or f.vulnerability_type or f.kind }}</h3>
+            <div class="text-muted-custom small mono text-break">{{ f.url }}</div>
+          </div>
+
+          <div class="soft-card p-3" style="min-width: 180px">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted-custom">Confidence</span>
+              <b>{{ confidence }}%</b>
+            </div>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-sm btn-outline-light"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#finding{{ loop.index }}"
+          >
+            Chi tiết
+          </button>
+        </div>
+
+        <div id="finding{{ loop.index }}" class="collapse mt-3">
+          <div class="row g-3">
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Kết luận nguy cơ</div>
+                <div>
+                  {{ f.conclusion or ('Có dấu hiệu/nguy cơ: ' ~ (f.vulnerability_type or f.kind)) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Confirmation</div>
+                <div class="mb-2">
+                  {% if confirm == 'confirmed' %}
+                  <span class="confirmation-pill confirmation-confirmed"
+                    ><i class="ti ti-shield-check"></i>confirmed</span
+                  >
+                  {% else %}
+                  <span class="confirmation-pill confirmation-possible"
+                    ><i class="ti ti-alert-triangle"></i>possible</span
+                  >
+                  {% endif %}
+                </div>
+                <div class="small text-muted-custom">
+                  {{ f.confirmation_reason or 'Chưa có marker xác nhận; finding dựa trên
+                  feedback/anomaly.' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Response feedback</div>
+                <div class="mono small">
+                  Status: {{ f.status }} · Length: {{ f.length }} · Type: {{ f.content_type }}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Marker verification</div>
+                {% if f.marker %}
+                <div class="mono small text-break mb-2">{{ f.marker }}</div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <span class="badge badge-soft-blue">Reflected: {{ f.marker_reflected }}</span>
+                  <span class="badge badge-soft-cyan">Hits: {{ marker_hits_count }}</span>
+                </div>
+                {% else %}
+                <span class="text-muted-custom">Không có marker cho finding này.</span>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if f.parameter %}
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Payload</div>
+                <div class="mono small">Type: {{ f.payload_type }}</div>
+                <div class="mono small text-break">{{ f.payload }}</div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="dark-card p-3 h-100">
+                <div class="fw-bold mb-2">Parameter type</div>
+                <span class="badge badge-soft-blue">{{ f.param_type }}</span>
+              </div>
+            </div>
+            {% endif %} {% if f.evidence or f.evidence_summary %}
+            <div class="col-12">
+              <div class="dark-card p-3">
+                <div class="fw-bold mb-2">Evidence</div>
+                {{ f.evidence_summary or f.evidence }}
+              </div>
+            </div>
+            {% endif %} {% if f.marker_hits %}
+            <div class="col-12">
+              <div class="dark-card p-3">
+                <div class="fw-bold mb-2">Marker hits</div>
+                <div class="table-responsive">
+                  <table class="table table-vcenter">
+                    <thead>
+                      <tr>
+                        <th>URL</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Length</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for hit in f.marker_hits[:8] %}
+                      <tr>
+                        <td class="mono small text-break">{{ hit.url }}</td>
+                        <td><span class="badge badge-soft-cyan">{{ hit.source }}</span></td>
+                        <td>{{ hit.status }}</td>
+                        <td>{{ hit.length }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="col-12">
+              <div class="dark-card p-3">
+                <div class="fw-bold mb-2">Reason</div>
+                {{ f.reason }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if result.findings %}
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+    <button class="btn btn-outline-light" id="prevFindingPage" type="button">← Trước</button>
+    <div class="text-muted-custom" id="findingPageInfo">Trang 1/1</div>
+    <button class="btn btn-outline-light" id="nextFindingPage" type="button">Sau →</button>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  const fingerprintScores = {{ result.fingerprint_scores|tojson }};
+
+  const fingerprintChartEl = document.getElementById('fingerprintChart');
+  if (fingerprintChartEl) {
+    new Chart(fingerprintChartEl, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(fingerprintScores || {}),
+        datasets: [
+          {
+            label: 'Fingerprint score',
+            data: Object.values(fingerprintScores || {}),
+            borderWidth: 0
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        scales: {
+          x: {
+            ticks: { color: '#cbd5e1' },
+            grid: { color: 'rgba(148,163,184,.12)' }
+          },
+          y: {
+            ticks: { color: '#cbd5e1' },
+            grid: { color: 'rgba(148,163,184,.08)' }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: '#e5e7eb' }
+          }
+        }
+      }
+    });
+  }
+
+  const findingItems = Array.from(document.querySelectorAll('.finding-item'));
+  const findingSearch = document.getElementById('findingSearch');
+  const findingFilter = document.getElementById('findingFilter');
+  const confirmationFilter = document.getElementById('confirmationFilter');
+  const prevFindingPage = document.getElementById('prevFindingPage');
+  const nextFindingPage = document.getElementById('nextFindingPage');
+  const findingPageInfo = document.getElementById('findingPageInfo');
+
+  let filteredFindings = [...findingItems];
+  let currentFindingPage = 1;
+  const findingsPerPage = 5;
+
+  function applyFindingFilters() {
+    const keyword = (findingSearch?.value || '').toLowerCase().trim();
+    const selectedType = findingFilter?.value || 'all';
+    const selectedConfirmation = confirmationFilter?.value || 'all';
+
+    filteredFindings = findingItems.filter((item) => {
+      const text = item.dataset.search || '';
+      const type = item.dataset.type || 'other';
+      const confirmation = item.dataset.confirmation || 'possible';
+
+      const matchKeyword = !keyword || text.includes(keyword);
+      const matchType = selectedType === 'all' || type === selectedType;
+      const matchConfirmation = selectedConfirmation === 'all' || confirmation === selectedConfirmation;
+
+      return matchKeyword && matchType && matchConfirmation;
+    });
+
+    currentFindingPage = 1;
+    renderFindingPage();
+  }
+
+  function renderFindingPage() {
+    const totalPages = Math.max(1, Math.ceil(filteredFindings.length / findingsPerPage));
+
+    if (currentFindingPage > totalPages) currentFindingPage = totalPages;
+
+    findingItems.forEach((item) => {
+      item.style.display = 'none';
+    });
+
+    const start = (currentFindingPage - 1) * findingsPerPage;
+    const end = start + findingsPerPage;
+
+    filteredFindings.slice(start, end).forEach((item) => {
+      item.style.display = '';
+    });
+
+    if (findingPageInfo) {
+      findingPageInfo.innerText = `Trang ${currentFindingPage}/${totalPages} · ${filteredFindings.length} finding`;
+    }
+
+    if (prevFindingPage) prevFindingPage.disabled = currentFindingPage <= 1;
+    if (nextFindingPage) nextFindingPage.disabled = currentFindingPage >= totalPages;
+  }
+
+  if (findingSearch) findingSearch.addEventListener('input', applyFindingFilters);
+  if (findingFilter) findingFilter.addEventListener('change', applyFindingFilters);
+  if (confirmationFilter) confirmationFilter.addEventListener('change', applyFindingFilters);
+
+  if (prevFindingPage) {
+    prevFindingPage.addEventListener('click', function () {
+      if (currentFindingPage > 1) {
+        currentFindingPage--;
+        renderFindingPage();
+      }
+    });
+  }
+
+  if (nextFindingPage) {
+    nextFindingPage.addEventListener('click', function () {
+      const totalPages = Math.max(1, Math.ceil(filteredFindings.length / findingsPerPage));
+      if (currentFindingPage < totalPages) {
+        currentFindingPage++;
+        renderFindingPage();
+      }
+    });
+  }
+
+  renderFindingPage();
+</script>
 {% endblock %}

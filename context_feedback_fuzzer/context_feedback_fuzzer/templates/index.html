@@ -1,189 +1,619 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Dashboard · Context Feedback Fuzzer{% endblock %} {%
+block content %} {% set total_reports = reports|length %} {% set total_findings = namespace(value=0)
+%} {% set total_confirmed = namespace(value=0) %} {% set total_possible = namespace(value=0) %} {%
+set total_marker_verified = namespace(value=0) %} {% set total_markers_generated =
+namespace(value=0) %} {% set total_crawled_links = namespace(value=0) %} {% for r in reports %} {%
+set total_findings.value = total_findings.value + (r.findings or 0) %} {% set total_confirmed.value
+= total_confirmed.value + (r.confirmed_findings or 0) %} {% set total_possible.value =
+total_possible.value + (r.possible_findings or 0) %} {% set total_marker_verified.value =
+total_marker_verified.value + (r.marker_verified_count or 0) %} {% set total_markers_generated.value
+= total_markers_generated.value + (r.markers_generated or 0) %} {% set total_crawled_links.value =
+total_crawled_links.value + (r.crawled_links_count or 0) %} {% endfor %} {% set running_jobs =
+namespace(value=0) %} {% for jid, job in jobs.items() %} {% if job.status in ['running', 'paused',
+'stopping'] %} {% set running_jobs.value = running_jobs.value + 1 %} {% endif %} {% endfor %} {% set
+confirmed_rate = ((total_confirmed.value / total_findings.value) * 100) if total_findings.value else
+0 %} {% set marker_rate = ((total_marker_verified.value / total_markers_generated.value) * 100) if
+total_markers_generated.value else 0 %}
 
-<div class="card">
-  <h2>Chạy scan</h2>
+<div class="row g-3 mb-4">
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon">
+          <i class="ti ti-file-analytics fs-2"></i>
+        </div>
+        <div>
+          <div class="text-muted-custom small">Latest targets</div>
+          <div class="h2 mb-0">{{ total_reports }}</div>
+          <div class="small text-muted-custom">Mỗi target lấy bản mới nhất</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <p class="muted">
-    Nhập target, chọn platform hoặc để auto, sau đó bấm bắt đầu fuzzing.
-    Tool sẽ chuyển sang màn hình tiến độ để hiển thị quá trình scan.
-  </p>
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon green">
+          <i class="ti ti-shield-check fs-2"></i>
+        </div>
+        <div>
+          <div class="text-muted-custom small">Confirmed findings</div>
+          <div class="h2 mb-0">{{ total_confirmed.value }}</div>
+          <div class="small text-muted-custom">Marker-based confirmed</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <form method="post" action="{{ url_for('scan_start') }}">
-    <div class="grid">
-      <div>
-        <label>Target URL</label>
-        <input
-          name="target"
-          placeholder="http://127.0.0.1:8080 hoặc https://example.com"
-          required
-        >
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon yellow">
+          <i class="ti ti-alert-triangle fs-2"></i>
+        </div>
+        <div>
+          <div class="text-muted-custom small">Possible findings</div>
+          <div class="h2 mb-0">{{ total_possible.value }}</div>
+          <div class="small text-muted-custom">Feedback/anomaly based</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="glass-card p-3 h-100">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon purple">
+          <i class="ti ti-player-play fs-2"></i>
+        </div>
+        <div>
+          <div class="text-muted-custom small">Active scans</div>
+          <div class="h2 mb-0">{{ running_jobs.value }}</div>
+          <div class="small text-muted-custom">Running / paused / stopping</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="glass-card p-4 h-100">
+      <div class="d-flex align-items-start justify-content-between gap-3 mb-4 flex-wrap">
+        <div>
+          <div class="badge badge-soft-blue mb-2">
+            <i class="ti ti-radar me-1"></i>
+            New scan
+          </div>
+          <h2 class="mb-1">Chạy Context Feedback Fuzzing</h2>
+          <p class="text-muted-custom mb-0">
+            Nhập target, chọn platform hoặc để auto. Tool sẽ fingerprint, tạo wordlist theo ngữ
+            cảnh, fuzz path/parameter, chạy marker verification và sinh report.
+          </p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge badge-soft-green">GET-only</span>
+          <span class="badge badge-soft-blue">Same-host</span>
+          <span class="badge badge-soft-purple">Marker verification</span>
+        </div>
       </div>
 
-      <div>
-        <label>Platform</label>
-        <select name="platform">
-          {% for c in platform_options %}
-            <option value="{{ c }}">{{ c }}</option>
-          {% endfor %}
-        </select>
+      <form method="post" action="{{ url_for('scan_start') }}">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Target URL</label>
+            <div class="input-icon">
+              <span class="input-icon-addon">
+                <i class="ti ti-world"></i>
+              </span>
+              <input
+                class="form-control"
+                name="target"
+                placeholder="http://127.0.0.1:8080 hoặc https://example.com"
+                required
+              />
+            </div>
+            <div class="form-hint text-muted-custom mt-1">
+              Chỉ nhập target thuộc lab hoặc hệ thống bạn được phép kiểm thử.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Platform context</label>
+            <select class="form-select" name="platform">
+              {% for c in platform_options %}
+              <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-hint text-muted-custom mt-1">
+              Auto sẽ fingerprint platform trước khi tạo wordlist.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Max requests</label>
+            <input class="form-control" name="max_requests" value="400" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Threads</label>
+            <input class="form-control" name="threads" value="4" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Delay / request</label>
+            <input class="form-control" name="delay" value="0.15" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Timeout</label>
+            <input class="form-control" name="timeout" value="8" />
+          </div>
+        </div>
+
+        <div class="soft-card p-3 mt-4">
+          <label class="form-check m-0">
+            <input class="form-check-input" type="checkbox" name="authorization" />
+            <span class="form-check-label">
+              Tôi xác nhận target thuộc lab hoặc đã được phép kiểm thử.
+            </span>
+          </label>
+        </div>
+
+        <div class="d-flex gap-2 mt-4 flex-wrap">
+          <button type="submit" class="btn btn-cff-primary btn-lg">
+            <i class="ti ti-player-play me-2"></i>
+            Bắt đầu fuzzing
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="glass-card p-4 h-100 chart-card">
+      <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3">
+        <div>
+          <div class="badge badge-soft-purple mb-2">
+            <i class="ti ti-chart-donut me-1"></i>
+            Verification overview
+          </div>
+          <h2 class="mb-1">Confirmed vs Possible</h2>
+          <p class="text-muted-custom mb-0">Biểu đồ tổng hợp từ các report mới nhất theo target.</p>
+        </div>
       </div>
 
-      <div>
-        <label>Threads</label>
-        <input name="threads" value="4">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <canvas id="confirmationChart" height="220"></canvas>
+        </div>
+        <div class="col-md-6">
+          <div class="soft-card p-3 mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted-custom">Confirmation rate</span>
+              <b>{{ "%.2f"|format(confirmed_rate) }}%</b>
+            </div>
+            <div class="progress" style="height: 10px">
+              <div
+                class="progress-bar progress-bar-confirmed"
+                style="width: {{ confirmed_rate }}%;"
+              ></div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted-custom">Marker verification rate</span>
+              <b>{{ "%.2f"|format(marker_rate) }}%</b>
+            </div>
+            <div class="progress" style="height: 10px">
+              <div
+                class="progress-bar progress-bar-marker"
+                style="width: {{ marker_rate }}%;"
+              ></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>Delay / request</label>
-        <input name="delay" value="0.15">
+      <div class="metric-grid mt-3">
+        <div class="metric-card">
+          <div class="metric-label">Markers generated</div>
+          <div class="metric-value">{{ total_markers_generated.value }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Markers verified</div>
+          <div class="metric-value">{{ total_marker_verified.value }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Findings</div>
+          <div class="metric-value">{{ total_findings.value }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Crawled links</div>
+          <div class="metric-value">{{ total_crawled_links.value }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-xl-7">
+    <div class="glass-card p-4 h-100">
+      <div class="badge badge-soft-cyan mb-2">
+        <i class="ti ti-route me-1"></i>
+        Workflow
+      </div>
+      <h2 class="mb-3">Luồng xử lý v2.1</h2>
+
+      <div class="timeline-vertical">
+        {% set steps = [ ('Baseline', 'Tạo response chuẩn để so sánh feedback'), ('Fingerprint
+        platform', 'Xác định CMS/LMS/Portal và server technology'), ('Context wordlist', 'Tạo
+        path/param/payload theo ngữ cảnh platform'), ('Path fuzzing', 'Kiểm tra endpoint đặc trưng
+        và response anomaly'), ('Parameter fuzzing', 'Fuzz theo param type và gắn marker duy nhất'),
+        ('Marker verification', 'Crawl link cùng host và kiểm tra marker xuất hiện lại'), ('Bug
+        confirmation', 'Phân loại confirmed / possible và tính confidence'), ('Report generation',
+        'Sinh JSON và Markdown report') ] %} {% for title, desc in steps %}
+        <div class="timeline-item-cff">
+          <div class="timeline-dot wait">
+            <i class="ti ti-circle-dot"></i>
+          </div>
+          <div>
+            <div class="fw-bold">{{ loop.index }}. {{ title }}</div>
+            <div class="small text-muted-custom">{{ desc }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="glass-card p-4 h-100">
+      <div class="badge badge-soft-green mb-2">
+        <i class="ti ti-stack-2 me-1"></i>
+        Platform profiles
+      </div>
+      <h2 class="mb-3">Nền tảng hỗ trợ</h2>
+
+      <div class="row g-2">
+        <div class="col-6">
+          <div class="soft-card p-3 h-100">
+            <span class="badge badge-soft-blue mb-2">CMS</span>
+            <div class="fw-bold">WordPress</div>
+            <div class="fw-bold">Joomla</div>
+            <div class="fw-bold">Drupal</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="soft-card p-3 h-100">
+            <span class="badge badge-soft-purple mb-2">LMS</span>
+            <div class="fw-bold">Moodle</div>
+            <div class="small text-muted-custom">Learning Management System</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="soft-card p-3 h-100">
+            <span class="badge badge-soft-green mb-2">Portal / DXP</span>
+            <div class="fw-bold">Liferay</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="soft-card p-3 h-100">
+            <span class="badge badge-soft-yellow mb-2">Collaboration</span>
+            <div class="fw-bold">SharePoint</div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>Timeout</label>
-        <input name="timeout" value="8">
+      <div class="soft-card p-3 mt-3">
+        <div class="small text-muted-custom mb-2">Điểm khác biệt của tool</div>
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge badge-soft-blue">Context-aware</span>
+          <span class="badge badge-soft-cyan">Feedback-based</span>
+          <span class="badge badge-soft-purple">Marker-based</span>
+          <span class="badge badge-soft-green">Bug confirmation</span>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div>
-        <label>Max requests</label>
-        <input name="max_requests" value="400">
+{% if jobs %}
+<div class="glass-card p-4 mt-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Scan jobs đang theo dõi</h2>
+      <div class="text-muted-custom">
+        Có thể quay lại dashboard trong khi scan vẫn chạy nền. Bấm mở để xem realtime.
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive table-scroll">
+    <table class="table table-vcenter">
+      <thead>
+        <tr>
+          <th>Target</th>
+          <th>Platform</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Requests</th>
+          <th>Findings</th>
+          <th>Confirmed</th>
+          <th>Marker</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for jid, job in jobs.items() %}
+        <tr>
+          <td class="mono small">{{ job.target }}</td>
+          <td><span class="badge badge-soft-blue">{{ job.platform_hint }}</span></td>
+          <td>
+            {% if job.status == 'done' %}
+            <span class="badge badge-soft-green">{{ job.status }}</span>
+            {% elif job.status in ['running', 'paused'] %}
+            <span class="badge badge-soft-yellow">{{ job.status }}</span>
+            {% elif job.status in ['stopping', 'stopped'] %}
+            <span class="badge badge-soft-red">{{ job.status }}</span>
+            {% else %}
+            <span class="badge badge-soft-blue">{{ job.status }}</span>
+            {% endif %}
+          </td>
+          <td style="min-width: 190px">
+            <div class="progress">
+              <div class="progress-bar progress-bar-cff" style="width: {{ job.progress }}%">
+                {{ job.progress }}%
+              </div>
+            </div>
+          </td>
+          <td>{{ job.requests_sent or 0 }}</td>
+          <td>{{ job.findings_count or 0 }}</td>
+          <td>
+            <span class="badge badge-soft-green">{{ job.confirmed_findings_count or 0 }}</span>
+          </td>
+          <td>
+            <span class="badge badge-soft-cyan">{{ job.marker_verified_count or 0 }}</span>
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-light"
+              href="{{ url_for('scan_result', job_id=jid) if job.result else url_for('scan_watch', job_id=jid) }}"
+            >
+              <i class="ti ti-eye me-1"></i>
+              Mở
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="glass-card p-4 mt-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Report mới nhất theo Target</h2>
+      <div class="text-muted-custom">
+        Mỗi target chỉ hiển thị bản scan mới nhất. Bảng có tìm kiếm và phân trang để tránh kéo dài.
       </div>
     </div>
 
-    <p>
-      <label>
-        <input type="checkbox" name="authorization" style="width:auto">
-        Tôi xác nhận target thuộc lab hoặc đã được phép kiểm thử
-      </label>
-    </p>
-
-    <button type="submit">
-      Bắt đầu fuzzing
-    </button>
-  </form>
-</div>
-
-
-<div class="card">
-  <h2>Luồng xử lý của tool</h2>
-
-  <table class="table">
-    <tr>
-      <th>Bước</th>
-      <th>Mô tả</th>
-    </tr>
-
-    <tr>
-      <td>1</td>
-      <td>Fingerprint platform và server technology</td>
-    </tr>
-
-    <tr>
-      <td>2</td>
-      <td>Tạo wordlist theo ngữ cảnh platform, server extension và parameter type</td>
-    </tr>
-
-    <tr>
-      <td>3</td>
-      <td>Fuzzing path và parameter bằng canary payload an toàn</td>
-    </tr>
-
-    <tr>
-      <td>4</td>
-      <td>Phân tích phản hồi server để kết luận nguy cơ bug</td>
-    </tr>
-
-    <tr>
-      <td>5</td>
-      <td>Sinh JSON report và Markdown report</td>
-    </tr>
-  </table>
-</div>
-
-
-<div class="card">
-  <h2>Các loại platform đang hỗ trợ</h2>
-
-  <table class="table">
-    <tr>
-      <th>Platform</th>
-      <th>Loại</th>
-      <th>Ý nghĩa</th>
-    </tr>
-
-    <tr>
-      <td>WordPress / Joomla / Drupal</td>
-      <td>CMS</td>
-      <td>Quản trị nội dung website</td>
-    </tr>
-
-    <tr>
-      <td>Moodle</td>
-      <td>LMS</td>
-      <td>Quản trị học tập trực tuyến, khóa học, quiz, bài tập, sinh viên</td>
-    </tr>
-
-    <tr>
-      <td>Liferay</td>
-      <td>Portal / DXP</td>
-      <td>Nền tảng cổng thông tin doanh nghiệp</td>
-    </tr>
-
-    <tr>
-      <td>SharePoint</td>
-      <td>Collaboration Platform</td>
-      <td>Nền tảng cộng tác, tài liệu, site nội bộ</td>
-    </tr>
-  </table>
-</div>
-
-
-<div class="card">
-  <h2>Report gần đây</h2>
+    <div class="report-search">
+      <input id="reportSearch" class="form-control" placeholder="Tìm target, platform, status..." />
+    </div>
+  </div>
 
   {% if not reports %}
-    <p class="muted">Chưa có report.</p>
-  {% endif %}
+  <div class="soft-card p-4 text-center text-muted-custom">Chưa có report.</div>
+  {% else %}
+  <div class="table-responsive table-scroll">
+    <table class="table table-vcenter" id="reportTable">
+      <thead>
+        <tr>
+          <th>Target</th>
+          <th>Platform</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Requests</th>
+          <th>Findings</th>
+          <th>Confirmed</th>
+          <th>Possible</th>
+          <th>Marker verified</th>
+          <th>Rate</th>
+          <th>Time</th>
+          <th>File</th>
+        </tr>
+      </thead>
 
-  {% if reports %}
-  <table class="table">
-    <tr>
-      <th>Target</th>
-      <th>Platform</th>
-      <th>Type</th>
-      <th>Requests</th>
-      <th>Findings</th>
-      <th>File</th>
-    </tr>
+      <tbody>
+        {% for r in reports %}
+        <tr class="report-row">
+          <td class="mono small">{{ r.target }}</td>
+          <td>
+            <span class="badge badge-soft-blue">{{ r.platform or r.cms }}</span>
+          </td>
+          <td>{{ r.platform_type or 'Web Platform' }}</td>
+          <td>
+            {% if r.scan_status == 'done' %}
+            <span class="badge badge-soft-green">{{ r.scan_status }}</span>
+            {% elif r.scan_status == 'stopped' %}
+            <span class="badge badge-soft-red">{{ r.scan_status }}</span>
+            {% else %}
+            <span class="badge badge-soft-yellow">{{ r.scan_status or 'done' }}</span>
+            {% endif %}
+          </td>
+          <td>{{ r.requests }}</td>
+          <td><span class="badge badge-soft-yellow">{{ r.findings }}</span></td>
+          <td><span class="badge badge-soft-green">{{ r.confirmed_findings or 0 }}</span></td>
+          <td><span class="badge badge-soft-yellow">{{ r.possible_findings or 0 }}</span></td>
+          <td><span class="badge badge-soft-cyan">{{ r.marker_verified_count or 0 }}</span></td>
+          <td>
+            <div style="min-width: 110px">
+              <div class="d-flex justify-content-between small mb-1">
+                <span class="text-muted-custom">Confirm</span>
+                <b>{{ r.confirmation_rate or 0 }}%</b>
+              </div>
+              <div class="progress" style="height: 8px">
+                <div
+                  class="progress-bar progress-bar-confirmed"
+                  style="width: {{ r.confirmation_rate or 0 }}%;"
+                ></div>
+              </div>
+            </div>
+          </td>
+          <td class="small text-muted-custom">{{ r.time or '' }}</td>
+          <td class="text-nowrap">
+            <a
+              class="btn btn-sm btn-outline-light"
+              href="{{ url_for('view_report', filename=r.md) }}"
+            >
+              <i class="ti ti-markdown me-1"></i>
+              Xem
+            </a>
+            <a
+              class="btn btn-sm btn-outline-info"
+              href="{{ url_for('download_report', filename=r.json) }}"
+            >
+              <i class="ti ti-download me-1"></i>
+              JSON
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-    {% for r in reports %}
-    <tr>
-      <td class="mono small">{{ r.target }}</td>
-      <td>{{ r.platform or r.cms }}</td>
-      <td>{{ r.platform_type or "Web Platform" }}</td>
-      <td>{{ r.requests }}</td>
-      <td>
-        <span class="badge">{{ r.findings }}</span>
-      </td>
-      <td>
-        <a
-          class="btn secondary small"
-          href="{{ url_for('view_report', filename=r.md) }}"
-        >
-          Xem MD
-        </a>
+  <div class="pagination-cff">
+    <button class="btn btn-sm btn-outline-light" id="prevReportPage" type="button">← Trước</button>
 
-        <a
-          class="btn secondary small"
-          href="{{ url_for('download_report', filename=r.json) }}"
-        >
-          Tải JSON
-        </a>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+    <span class="text-muted-custom" id="reportPageInfo"></span>
+
+    <button class="btn btn-sm btn-outline-light" id="nextReportPage" type="button">Sau →</button>
+  </div>
   {% endif %}
 </div>
 
+<div
+  id="dashboardData"
+  data-confirmed="{{ total_confirmed.value }}"
+  data-possible="{{ total_possible.value }}"
+  style="display: none"
+></div>
+
+{% endblock %} {% block scripts %}
+<script>
+  const dashboardData = document.getElementById('dashboardData');
+  const dashboardConfirmed = Number(dashboardData?.dataset.confirmed || 0);
+  const dashboardPossible = Number(dashboardData?.dataset.possible || 0);
+
+  const confirmationChartEl = document.getElementById('confirmationChart');
+
+  if (confirmationChartEl) {
+    new Chart(confirmationChartEl, {
+      type: 'doughnut',
+      data: {
+        labels: ['Confirmed', 'Possible'],
+        datasets: [
+          {
+            data: [dashboardConfirmed, dashboardPossible],
+            borderWidth: 0,
+          },
+        ],
+      },
+      options: {
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#e5e7eb',
+              usePointStyle: true,
+              pointStyle: 'circle',
+            },
+          },
+        },
+      },
+    });
+  }
+
+  const reportRows = Array.from(document.querySelectorAll('.report-row'));
+  const reportSearch = document.getElementById('reportSearch');
+  const prevReportPage = document.getElementById('prevReportPage');
+  const nextReportPage = document.getElementById('nextReportPage');
+  const reportPageInfo = document.getElementById('reportPageInfo');
+
+  let filteredRows = [...reportRows];
+  let currentReportPage = 1;
+  const rowsPerPage = 6;
+
+  function renderReportPage() {
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
+    currentReportPage = Math.min(currentReportPage, totalPages);
+
+    reportRows.forEach((row) => {
+      row.style.display = 'none';
+    });
+
+    const start = (currentReportPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    filteredRows.slice(start, end).forEach((row) => {
+      row.style.display = '';
+    });
+
+    if (reportPageInfo) {
+      reportPageInfo.innerText = `Trang ${currentReportPage}/${totalPages} · ${filteredRows.length} target`;
+    }
+
+    if (prevReportPage) {
+      prevReportPage.disabled = currentReportPage <= 1;
+    }
+
+    if (nextReportPage) {
+      nextReportPage.disabled = currentReportPage >= totalPages;
+    }
+  }
+
+  if (reportSearch) {
+    reportSearch.addEventListener('input', function () {
+      const keyword = this.value.toLowerCase().trim();
+
+      filteredRows = reportRows.filter((row) => row.innerText.toLowerCase().includes(keyword));
+
+      currentReportPage = 1;
+      renderReportPage();
+    });
+  }
+
+  if (prevReportPage) {
+    prevReportPage.addEventListener('click', function () {
+      if (currentReportPage > 1) {
+        currentReportPage--;
+        renderReportPage();
+      }
+    });
+  }
+
+  if (nextReportPage) {
+    nextReportPage.addEventListener('click', function () {
+      const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
+
+      if (currentReportPage < totalPages) {
+        currentReportPage++;
+        renderReportPage();
+      }
+    });
+  }
+
+  renderReportPage();
+</script>
 {% endblock %}

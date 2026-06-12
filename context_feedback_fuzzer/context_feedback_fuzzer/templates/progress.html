@@ -1,93 +1,275 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Realtime Scan · Context Feedback Fuzzer{% endblock %} {%
+block content %}
 
-<div class="card">
-  <h2>🚀 Đang chạy Context Feedback Fuzzer</h2>
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="glass-card p-4 h-100">
+      <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3">
+        <div>
+          <div class="badge badge-soft-blue mb-2">
+            <i class="ti ti-activity me-1"></i> Realtime scan
+          </div>
+          <h2 class="mb-1">Scan Dashboard</h2>
+          <p class="text-muted-custom mb-0">
+            Theo dõi realtime quá trình context-aware và feedback-based fuzzing.
+          </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a class="btn btn-outline-light" href="{{ url_for('index') }}"
+            ><i class="ti ti-layout-dashboard me-1"></i>Dashboard</a
+          >
+          <button class="btn btn-outline-warning" id="pauseBtn" type="button">
+            <i class="ti ti-player-pause me-1"></i>Pause
+          </button>
+          <button class="btn btn-cff-success" id="resumeBtn" type="button">
+            <i class="ti ti-player-play me-1"></i>Resume
+          </button>
+          <button class="btn btn-cff-danger" id="stopBtn" type="button">
+            <i class="ti ti-square-x me-1"></i>Stop
+          </button>
+          <a
+            class="btn btn-cff-primary"
+            id="resultBtn"
+            href="{{ url_for('scan_result', job_id=job_id) }}"
+            style="display: none"
+            ><i class="ti ti-file-analytics me-1"></i>Kết quả</a
+          >
+        </div>
+      </div>
 
-  <p class="muted">
-    Tool đang thực hiện quy trình context-aware và feedback-based fuzzing.
-  </p>
+      <div class="mb-2 d-flex justify-content-between align-items-center">
+        <span class="fw-bold" id="progressLabel">0%</span>
+        <span class="text-muted-custom" id="stepText">Đang khởi tạo...</span>
+      </div>
+      <div class="progress progress-lg mb-4" style="height: 18px">
+        <div
+          class="progress-bar progress-bar-striped progress-bar-animated"
+          id="progressBar"
+          style="width: 0%"
+        ></div>
+      </div>
 
-  <ol class="step-list">
-    <li>Fingerprint platform: CMS, LMS, Portal hoặc SharePoint</li>
-    <li>Xây dựng wordlist theo ngữ cảnh platform</li>
-    <li>Fuzzing path và parameter bằng canary payload an toàn</li>
-    <li>Phân tích phản hồi server để suy luận nguy cơ bug</li>
-    <li>Tạo JSON report và Markdown report</li>
-  </ol>
+      <div class="row g-3">
+        <div class="col-sm-6 col-lg-3">
+          <div class="soft-card p-3">
+            <div class="text-muted-custom small">Status</div>
+            <div class="h3 mb-0" id="statusText">running</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="soft-card p-3">
+            <div class="text-muted-custom small">Requests</div>
+            <div class="h3 mb-0" id="requestsText">0</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="soft-card p-3">
+            <div class="text-muted-custom small">Findings</div>
+            <div class="h3 mb-0" id="findingsText">0</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="soft-card p-3">
+            <div class="text-muted-custom small">Platform hint</div>
+            <div class="h3 mb-0" id="platformHintText">-</div>
+          </div>
+        </div>
+      </div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar">0%</div>
+      <div class="soft-card p-3 mt-3">
+        <div class="text-muted-custom small mb-1">Target</div>
+        <div class="mono small" id="targetText">-</div>
+      </div>
+    </div>
   </div>
 
-  <div class="status-box">
-    <p>
-      <b>Trạng thái hiện tại:</b>
-    </p>
-
-    <p id="stepText" class="muted">
-      Đang khởi tạo...
-    </p>
+  <div class="col-xl-4">
+    <div class="glass-card p-4 h-100">
+      <div class="badge badge-soft-purple mb-2"><i class="ti ti-git-branch me-1"></i> Workflow</div>
+      <h2 class="mb-3">Scan steps</h2>
+      <div id="workflowBox" class="timeline-vertical">
+        <div class="timeline-item-cff" data-step="1">
+          <div class="timeline-dot wait">1</div>
+          <div>
+            <div class="fw-bold">Baseline</div>
+            <div class="small text-muted-custom">Tạo response chuẩn</div>
+          </div>
+        </div>
+        <div class="timeline-item-cff" data-step="2">
+          <div class="timeline-dot wait">2</div>
+          <div>
+            <div class="fw-bold">Fingerprint</div>
+            <div class="small text-muted-custom">Detect platform + server</div>
+          </div>
+        </div>
+        <div class="timeline-item-cff" data-step="3">
+          <div class="timeline-dot wait">3</div>
+          <div>
+            <div class="fw-bold">Context wordlist</div>
+            <div class="small text-muted-custom">Sinh path/param/payload</div>
+          </div>
+        </div>
+        <div class="timeline-item-cff" data-step="4">
+          <div class="timeline-dot wait">4</div>
+          <div>
+            <div class="fw-bold">Path fuzzing</div>
+            <div class="small text-muted-custom">Fuzz endpoint đặc trưng</div>
+          </div>
+        </div>
+        <div class="timeline-item-cff" data-step="5">
+          <div class="timeline-dot wait">5</div>
+          <div>
+            <div class="fw-bold">Parameter fuzzing</div>
+            <div class="small text-muted-custom">Fuzz theo param type</div>
+          </div>
+        </div>
+        <div class="timeline-item-cff" data-step="6">
+          <div class="timeline-dot wait">6</div>
+          <div>
+            <div class="fw-bold">Feedback report</div>
+            <div class="small text-muted-custom">Phân tích phản hồi</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-
-<div class="card">
-  <h3>Thông tin</h3>
-
-  <p class="muted">
-    Vui lòng không đóng trình duyệt trong khi scan đang chạy.
-  </p>
-
-  <p class="muted">
-    Sau khi hoàn tất, hệ thống sẽ tự động chuyển tới trang kết quả.
-  </p>
-
-  <p class="muted">
-    Lưu ý: Tool chỉ dùng phương thức GET, giới hạn cùng host và yêu cầu xác nhận quyền kiểm thử.
-  </p>
+<div class="row g-4 mt-1">
+  <div class="col-xl-7">
+    <div class="glass-card p-4 h-100">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="mb-1">Step output</h2>
+          <div class="text-muted-custom">Input/output của step hiện tại.</div>
+        </div>
+        <span class="badge badge-soft-blue" id="phaseBadge">waiting</span>
+      </div>
+      <pre id="currentOutput" class="json-box mono small mb-0">Chưa có dữ liệu.</pre>
+    </div>
+  </div>
+  <div class="col-xl-5">
+    <div class="glass-card p-4 h-100">
+      <h2 class="mb-1">Timeline log</h2>
+      <p class="text-muted-custom">Các event sinh ra từ scanner engine.</p>
+      <div id="logBox" class="log-box mono small">Chưa có log.</div>
+    </div>
+  </div>
 </div>
 
+<div class="glass-card p-4 mt-4">
+  <div class="d-flex align-items-start gap-3">
+    <div class="stat-icon"><i class="ti ti-shield-lock fs-2"></i></div>
+    <div>
+      <h3 class="mb-1">Thông tin an toàn</h3>
+      <p class="text-muted-custom mb-0">
+        Tool chỉ dùng GET, giới hạn cùng host, có rate-limit và yêu cầu xác nhận quyền kiểm thử. Khi
+        bấm Stop, tool sẽ cố gắng tạo partial report từ dữ liệu đã thu được.
+      </p>
+    </div>
+  </div>
+</div>
 
+{% endblock %} {% block scripts %}
 <script>
-const jobId = "{{ job_id }}";
+  const jobId = '{{ job_id }}';
+  let lastStep = 0;
 
-async function updateProgress() {
+  async function postAction(action) {
+    await fetch(`/scan/${action}/${jobId}`, { method: 'POST' });
+    setTimeout(updateProgress, 350);
+  }
+
+  document.getElementById('pauseBtn').addEventListener('click', () => postAction('pause'));
+  document.getElementById('resumeBtn').addEventListener('click', () => postAction('resume'));
+  document.getElementById('stopBtn').addEventListener('click', () => postAction('stop'));
+
+  function setWorkflow(step, status) {
+    document.querySelectorAll('#workflowBox [data-step]').forEach((item) => {
+      const n = parseInt(item.dataset.step, 10);
+      const dot = item.querySelector('.timeline-dot');
+      dot.classList.remove('done', 'wait');
+      if (n < step || status === 'done') {
+        dot.classList.add('done');
+        dot.innerHTML = '<i class="ti ti-check"></i>';
+      } else if (n === step) {
+        dot.classList.add('done');
+        dot.innerHTML = '<i class="ti ti-loader-2"></i>';
+      } else {
+        dot.classList.add('wait');
+        dot.innerText = n;
+      }
+    });
+  }
+
+  function renderCurrentOutput(current) {
+    if (!current || Object.keys(current).length === 0) return 'Chưa có dữ liệu.';
+    return JSON.stringify(current, null, 2);
+  }
+
+  function renderLogs(logs) {
+    if (!logs || logs.length === 0) return 'Chưa có log.';
+    return logs
+      .map(
+        (item) =>
+          `<div class="log-line"><span class="text-muted-custom">[${item.time}]</span> ${item.message}</div>`
+      )
+      .join('');
+  }
+
+  async function updateProgress() {
     try {
-        const response = await fetch(`/scan/progress/${jobId}`);
-        const data = await response.json();
+      const response = await fetch(`/scan/progress/${jobId}`);
+      const data = await response.json();
+      const progress = data.progress || 0;
+      const current = data.current || {};
+      const step = current.step || data.step_number || lastStep || inferStep(progress);
+      lastStep = step;
 
-        const progressBar = document.getElementById("progressBar");
-        const stepText = document.getElementById("stepText");
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = progress + '%';
+      progressBar.innerText = progress + '%';
+      document.getElementById('progressLabel').innerText = progress + '%';
+      document.getElementById('stepText').innerText = data.step || 'Đang xử lý...';
+      document.getElementById('statusText').innerText = data.status || 'unknown';
+      document.getElementById('requestsText').innerText = data.requests_sent || 0;
+      document.getElementById('findingsText').innerText = data.findings_count || 0;
+      document.getElementById('targetText').innerText = data.target || '-';
+      document.getElementById('platformHintText').innerText = data.platform_hint || '-';
+      document.getElementById('phaseBadge').innerText = current.phase || data.status || 'waiting';
+      document.getElementById('currentOutput').innerText = renderCurrentOutput(current);
+      document.getElementById('logBox').innerHTML = renderLogs(data.logs || []);
+      setWorkflow(step, data.status);
 
-        const progress = data.progress || 0;
+      progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+      if (data.status === 'paused') progressBar.classList.add('bg-warning');
+      else if (['stopping', 'stopped', 'error'].includes(data.status))
+        progressBar.classList.add('bg-danger');
+      else if (data.status === 'done') progressBar.classList.add('bg-success');
+      else progressBar.classList.add('bg-primary');
 
-        progressBar.style.width = progress + "%";
-        progressBar.innerText = progress + "%";
-        stepText.innerText = data.step || "Đang xử lý...";
-
-        if (data.status === "done") {
-            window.location.href = `/scan/result/${jobId}`;
-            return;
-        }
-
-        if (data.status === "error") {
-            stepText.innerText =
-                "❌ Scan bị lỗi: " + (data.error || "Unknown error");
-
-            progressBar.style.background = "#dc2626";
-            return;
-        }
-
-        setTimeout(updateProgress, 1000);
-
+      if (data.has_result || ['done', 'stopped'].includes(data.status)) {
+        document.getElementById('resultBtn').style.display = 'inline-block';
+      }
+      if (data.status === 'done') {
+        window.location.href = `/scan/result/${jobId}`;
+        return;
+      }
+      if (data.status !== 'stopped' && data.status !== 'error') setTimeout(updateProgress, 1000);
     } catch (err) {
-        document.getElementById("stepText").innerText =
-            "❌ Không thể lấy trạng thái scan";
+      document.getElementById('stepText').innerText = 'Không thể lấy trạng thái scan.';
     }
-}
+  }
 
-updateProgress();
+  function inferStep(progress) {
+    if (progress < 15) return 1;
+    if (progress < 30) return 2;
+    if (progress < 40) return 3;
+    if (progress < 70) return 4;
+    if (progress < 90) return 5;
+    return 6;
+  }
+
+  updateProgress();
 </script>
-
 {% endblock %}

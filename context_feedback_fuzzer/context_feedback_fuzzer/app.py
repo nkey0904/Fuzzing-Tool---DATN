@@ -41,12 +41,81 @@ def make_out_prefix(target: str, platform: str) -> str:
     return os.path.join(REPORT_DIR, f"{platform}_{host}_{ts}")
 
 
+def safe_percent(value: float | int | str | None) -> float:
+    try:
+        return round(float(value), 2)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def get_confirmation_summary(result: dict) -> dict:
+    """
+    Lấy thống kê confirmation từ fuzzer v2.1.
+    Nếu report cũ chưa có confirmation_summary thì tự tính từ findings.
+    """
+    summary = result.get("confirmation_summary") or {}
+    findings = result.get("findings", [])
+
+    confirmed = summary.get("confirmed_findings_count")
+    possible = summary.get("possible_findings_count")
+
+    if confirmed is None:
+        confirmed = sum(1 for f in findings if f.get("confirmation") == "confirmed")
+
+    if possible is None:
+        possible = max(0, len(findings) - confirmed)
+
+    total = confirmed + possible
+    confirmation_rate = summary.get("confirmation_rate")
+    if confirmation_rate is None:
+        confirmation_rate = round((confirmed / total) * 100, 2) if total else 0.0
+
+    marker_block = result.get("marker_based_fuzzing") or {}
+
+    return {
+        "confirmed_findings_count": int(confirmed or 0),
+        "possible_findings_count": int(possible or 0),
+        "confirmation_rate": safe_percent(confirmation_rate),
+        "marker_verified_count": int(
+            summary.get("marker_verified_count", result.get("marker_verified_count", marker_block.get("marker_verified_count", 0))) or 0
+        ),
+        "markers_failed": int(
+            summary.get("markers_failed", result.get("markers_failed", marker_block.get("markers_failed", 0))) or 0
+        ),
+        "marker_verification_rate": safe_percent(
+            summary.get(
+                "marker_verification_rate",
+                result.get("marker_verification_rate", marker_block.get("marker_verification_rate", 0.0)),
+            )
+        ),
+        "crawled_links_count": int(
+            summary.get("crawled_links_count", result.get("crawled_links_count", marker_block.get("crawled_links_count", 0))) or 0
+        ),
+        "markers_generated": int(marker_block.get("markers_generated", 0) or 0),
+    }
+
+
 def normalize_findings_for_report(result: dict) -> dict:
+    """
+    Chuẩn hóa dữ liệu để UI dùng được với cả report cũ và report v2.1.
+    Không xóa confidence vì v2.1 dùng confidence để hiển thị độ tin cậy.
+    """
     platform = result.get("detected_platform") or result.get("detected_cms") or "unknown"
 
     result["detected_platform"] = platform
     result["detected_cms"] = platform
     result["platform_type"] = result.get("platform_type") or get_platform_type(platform)
+
+    confirmation_summary = get_confirmation_summary(result)
+    result["confirmation_summary"] = confirmation_summary
+
+    result["confirmed_findings_count"] = confirmation_summary["confirmed_findings_count"]
+    result["possible_findings_count"] = confirmation_summary["possible_findings_count"]
+    result["confirmation_rate"] = confirmation_summary["confirmation_rate"]
+    result["marker_verified_count"] = confirmation_summary["marker_verified_count"]
+    result["markers_failed"] = confirmation_summary["markers_failed"]
+    result["marker_verification_rate"] = confirmation_summary["marker_verification_rate"]
+    result["crawled_links_count"] = confirmation_summary["crawled_links_count"]
 
     for item in result.get("findings", []):
         vuln = item.get("vulnerability_type") or item.get("kind") or "Response Anomaly"
@@ -55,19 +124,57 @@ def normalize_findings_for_report(result: dict) -> dict:
         item["bug_hypothesis"] = vuln
         item["conclusion"] = item.get("conclusion") or f"Có dấu hiệu/nguy cơ: {vuln}"
         item["evidence_summary"] = evidence
-        item["research_note"] = "Finding được sinh ra từ cơ chế feedback-based fuzzing."
+        item["research_note"] = "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
 
-        if "confidence" in item:
-            item.pop("confidence", None)
+        item["confirmation"] = item.get("confirmation", "possible")
+        item["confirmation_level"] = item.get("confirmation_level", item.get("confirmation", "possible"))
+        item["confirmation_reason"] = item.get(
+            "confirmation_reason",
+            "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+        )
+        item["confidence"] = item.get("confidence", 0)
+        item["marker_reflected"] = item.get("marker_reflected", False)
+        item["marker_hits"] = item.get("marker_hits") or []
+        item["verification_pages"] = item.get("verification_pages") or item.get("marker_hits") or []
 
     return result
 
 
+def build_summary(result: dict, json_path: str, md_path: str) -> dict:
+    detected_platform = result.get("detected_platform", result.get("detected_cms", "unknown"))
+    confirmation_summary = get_confirmation_summary(result)
+    marker_block = result.get("marker_based_fuzzing") or {}
+
+    return {
+        "detected_platform": detected_platform,
+        "detected_cms": detected_platform,
+        "platform_type": result.get("platform_type", get_platform_type(detected_platform)),
+        "requests_sent": result.get("requests_sent", 0),
+        "findings_count": len(result.get("findings", [])),
+        "confirmed_findings_count": confirmation_summary["confirmed_findings_count"],
+        "possible_findings_count": confirmation_summary["possible_findings_count"],
+        "confirmation_rate": confirmation_summary["confirmation_rate"],
+        "marker_verified_count": confirmation_summary["marker_verified_count"],
+        "markers_generated": marker_block.get("markers_generated", confirmation_summary["markers_generated"]),
+        "markers_failed": confirmation_summary["markers_failed"],
+        "marker_verification_rate": confirmation_summary["marker_verification_rate"],
+        "crawled_links_count": confirmation_summary["crawled_links_count"],
+        "json_file": os.path.basename(json_path),
+        "md_file": os.path.basename(md_path),
+        "target": result.get("target", ""),
+        "scan_status": result.get("scan_status", "unknown"),
+    }
+
+
 def list_reports() -> list[dict]:
+    """
+    Chỉ lấy report mới nhất của mỗi target.
+    Tránh dashboard bị lặp nhiều dòng khi scan cùng một target nhiều lần.
+    """
     if not os.path.exists(REPORT_DIR):
         return []
 
-    items = []
+    latest_by_target: dict[str, dict] = {}
 
     for name in os.listdir(REPORT_DIR):
         if not name.endswith(".json"):
@@ -80,25 +187,49 @@ def list_reports() -> list[dict]:
                 data = json.load(f)
 
             data = normalize_findings_for_report(data)
-            platform = data.get("detected_platform", data.get("detected_cms", ""))
 
-            items.append({
+            target = data.get("target", "")
+            platform = data.get("detected_platform", data.get("detected_cms", ""))
+            confirmation_summary = get_confirmation_summary(data)
+            marker_block = data.get("marker_based_fuzzing") or {}
+            mtime = os.path.getmtime(path)
+
+            item = {
                 "name": name,
-                "target": data.get("target", ""),
+                "target": target,
                 "platform": platform,
                 "cms": platform,
                 "platform_type": data.get("platform_type", get_platform_type(platform)),
                 "requests": data.get("requests_sent", 0),
                 "findings": len(data.get("findings", [])),
+                "confirmed_findings": confirmation_summary["confirmed_findings_count"],
+                "possible_findings": confirmation_summary["possible_findings_count"],
+                "confirmation_rate": confirmation_summary["confirmation_rate"],
+                "marker_verified_count": confirmation_summary["marker_verified_count"],
+                "markers_generated": marker_block.get("markers_generated", confirmation_summary["markers_generated"]),
+                "markers_failed": confirmation_summary["markers_failed"],
+                "marker_verification_rate": confirmation_summary["marker_verification_rate"],
+                "crawled_links_count": confirmation_summary["crawled_links_count"],
+                "scan_status": data.get("scan_status", "unknown"),
                 "json": name,
                 "md": name[:-5] + ".md",
-                "mtime": os.path.getmtime(path),
-            })
+                "mtime": mtime,
+                "time": datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S"),
+            }
+
+            if target not in latest_by_target:
+                latest_by_target[target] = item
+            elif mtime > latest_by_target[target]["mtime"]:
+                latest_by_target[target] = item
 
         except Exception:
             continue
 
-    return sorted(items, key=lambda x: x["mtime"], reverse=True)[:20]
+    return sorted(
+        latest_by_target.values(),
+        key=lambda x: x["mtime"],
+        reverse=True,
+    )
 
 
 @app.route("/", methods=["GET"])
@@ -110,6 +241,7 @@ def index():
         platform_options=platform_options,
         cms_options=platform_options,
         reports=list_reports(),
+        jobs=SCAN_JOBS,
     )
 
 
@@ -146,14 +278,77 @@ def scan_start():
         "status": "running",
         "progress": 0,
         "step": "Khởi tạo scan",
+        "step_number": 0,
         "error": "",
         "result": None,
+        "summary": None,
+        "paused": False,
+        "stopped": False,
+        "logs": [],
+        "current": {},
+        "requests_sent": 0,
+        "findings_count": 0,
+        "confirmed_findings_count": 0,
+        "possible_findings_count": 0,
+        "confirmation_rate": 0.0,
+        "markers_generated": 0,
+        "marker_verified_count": 0,
+        "markers_failed": 0,
+        "marker_verification_rate": 0.0,
+        "crawled_links_count": 0,
+        "target": target,
+        "platform_hint": platform,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
+
+    def append_log(message: str) -> None:
+        if not message:
+            return
+        SCAN_JOBS[job_id]["logs"].append({
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "message": message,
+        })
+        SCAN_JOBS[job_id]["logs"] = SCAN_JOBS[job_id]["logs"][-60:]
+
+    def update_progress(event: dict) -> None:
+        job = SCAN_JOBS[job_id]
+        extra = event.get("extra", {}) or {}
+
+        # Nếu user bấm pause thì giữ trạng thái paused, còn không thì running.
+        if job.get("stopped"):
+            job["status"] = "stopping"
+        else:
+            job["status"] = "paused" if job.get("paused") else "running"
+
+        job["progress"] = event.get("progress", job.get("progress", 0))
+        job["step"] = event.get("message", job.get("step", ""))
+        job["step_number"] = event.get("step", job.get("step_number", 0))
+        job["current"] = extra
+        job["requests_sent"] = event.get("requests_sent", job.get("requests_sent", 0))
+        job["findings_count"] = event.get("findings_count", job.get("findings_count", 0))
+
+        # Metrics từ fuzzer v2.1
+        job["confirmed_findings_count"] = extra.get("confirmed_findings", job.get("confirmed_findings_count", 0))
+        job["possible_findings_count"] = extra.get("possible_findings", job.get("possible_findings_count", 0))
+        job["confirmation_rate"] = extra.get("confirmation_rate", job.get("confirmation_rate", 0.0))
+        job["markers_generated"] = extra.get("markers_generated", job.get("markers_generated", 0))
+        job["marker_verified_count"] = extra.get("markers_verified", job.get("marker_verified_count", 0))
+        job["marker_verification_rate"] = extra.get("marker_verification_rate", job.get("marker_verification_rate", 0.0))
+        job["crawled_links_count"] = extra.get("crawled_links", job.get("crawled_links_count", 0))
+
+        append_log(event.get("message", ""))
+
+    def read_control() -> dict:
+        job = SCAN_JOBS[job_id]
+        return {
+            "paused": job.get("paused", False),
+            "stopped": job.get("stopped", False),
+            "progress": job.get("progress", 0),
+        }
 
     def worker() -> None:
         try:
-            SCAN_JOBS[job_id]["progress"] = 10
-            SCAN_JOBS[job_id]["step"] = "Bước 1/5: Chuẩn bị cấu hình scan"
+            append_log("Scan job được khởi tạo")
 
             fuzzer = ContextFeedbackFuzzer(
                 base_url=target,
@@ -163,49 +358,49 @@ def scan_start():
                 delay=delay,
                 timeout=timeout,
                 max_requests=max_requests,
+                progress_callback=update_progress,
+                control_callback=read_control,
             )
 
-            SCAN_JOBS[job_id]["progress"] = 20
-            SCAN_JOBS[job_id]["step"] = "Bước 2/5: Fingerprint platform và server technology"
-
             result = fuzzer.run()
-
-            SCAN_JOBS[job_id]["progress"] = 75
-            SCAN_JOBS[job_id]["step"] = "Bước 4/5: Chuẩn hóa finding và kết luận nguy cơ"
-
             result = normalize_findings_for_report(result)
 
-            SCAN_JOBS[job_id]["progress"] = 90
-            SCAN_JOBS[job_id]["step"] = "Bước 5/5: Tạo JSON và Markdown report"
-
             detected_platform = result.get("detected_platform", result.get("detected_cms", "unknown"))
-
             out_prefix = make_out_prefix(result["target"], detected_platform)
             json_path, md_path = write_reports(result, out_prefix)
+            summary = build_summary(result, json_path, md_path)
 
-            summary = {
-                "detected_platform": detected_platform,
-                "detected_cms": detected_platform,
-                "platform_type": result.get("platform_type", get_platform_type(detected_platform)),
-                "requests_sent": result["requests_sent"],
-                "findings_count": len(result["findings"]),
-                "json_file": os.path.basename(json_path),
-                "md_file": os.path.basename(md_path),
-                "target": result["target"],
-            }
+            if result.get("scan_status") == "stopped" or SCAN_JOBS[job_id].get("stopped"):
+                SCAN_JOBS[job_id]["status"] = "stopped"
+                SCAN_JOBS[job_id]["step"] = "Scan đã dừng. Partial report đã được tạo."
+                append_log("Scan đã dừng theo yêu cầu người dùng")
+            else:
+                SCAN_JOBS[job_id]["status"] = "done"
+                SCAN_JOBS[job_id]["progress"] = 100
+                SCAN_JOBS[job_id]["step"] = "Hoàn tất scan"
+                append_log("Scan hoàn tất")
 
-            SCAN_JOBS[job_id]["status"] = "done"
-            SCAN_JOBS[job_id]["progress"] = 100
-            SCAN_JOBS[job_id]["step"] = "Hoàn tất scan"
             SCAN_JOBS[job_id]["result"] = {
                 "result": result,
                 "summary": summary,
             }
+            SCAN_JOBS[job_id]["summary"] = summary
+            SCAN_JOBS[job_id]["requests_sent"] = result.get("requests_sent", 0)
+            SCAN_JOBS[job_id]["findings_count"] = len(result.get("findings", []))
+            SCAN_JOBS[job_id]["confirmed_findings_count"] = summary["confirmed_findings_count"]
+            SCAN_JOBS[job_id]["possible_findings_count"] = summary["possible_findings_count"]
+            SCAN_JOBS[job_id]["confirmation_rate"] = summary["confirmation_rate"]
+            SCAN_JOBS[job_id]["markers_generated"] = summary["markers_generated"]
+            SCAN_JOBS[job_id]["marker_verified_count"] = summary["marker_verified_count"]
+            SCAN_JOBS[job_id]["markers_failed"] = summary["markers_failed"]
+            SCAN_JOBS[job_id]["marker_verification_rate"] = summary["marker_verification_rate"]
+            SCAN_JOBS[job_id]["crawled_links_count"] = summary["crawled_links_count"]
 
         except Exception as e:
             SCAN_JOBS[job_id]["status"] = "error"
             SCAN_JOBS[job_id]["error"] = str(e)
             SCAN_JOBS[job_id]["step"] = "Scan bị lỗi"
+            append_log(f"Scan bị lỗi: {e}")
 
     threading.Thread(target=worker, daemon=True).start()
 
@@ -222,14 +417,92 @@ def scan_progress(job_id: str):
             "progress": 0,
             "step": "Không tìm thấy job",
             "error": "Job not found",
+            "requests_sent": 0,
+            "findings_count": 0,
+            "confirmed_findings_count": 0,
+            "possible_findings_count": 0,
+            "confirmation_rate": 0.0,
+            "markers_generated": 0,
+            "marker_verified_count": 0,
+            "markers_failed": 0,
+            "marker_verification_rate": 0.0,
+            "crawled_links_count": 0,
+            "current": {},
+            "logs": [],
         }, 404
 
     return {
         "status": job.get("status", "unknown"),
         "progress": job.get("progress", 0),
         "step": job.get("step", ""),
+        "step_number": job.get("step_number", 0),
         "error": job.get("error", ""),
+        "requests_sent": job.get("requests_sent", 0),
+        "findings_count": job.get("findings_count", 0),
+        "confirmed_findings_count": job.get("confirmed_findings_count", 0),
+        "possible_findings_count": job.get("possible_findings_count", 0),
+        "confirmation_rate": job.get("confirmation_rate", 0.0),
+        "markers_generated": job.get("markers_generated", 0),
+        "marker_verified_count": job.get("marker_verified_count", 0),
+        "markers_failed": job.get("markers_failed", 0),
+        "marker_verification_rate": job.get("marker_verification_rate", 0.0),
+        "crawled_links_count": job.get("crawled_links_count", 0),
+        "current": job.get("current", {}),
+        "logs": job.get("logs", []),
+        "target": job.get("target", ""),
+        "platform_hint": job.get("platform_hint", ""),
+        "created_at": job.get("created_at", ""),
+        "has_result": bool(job.get("result")),
     }
+
+
+@app.route("/scan/watch/<job_id>", methods=["GET"])
+def scan_watch(job_id: str):
+    if job_id not in SCAN_JOBS:
+        flash("Không tìm thấy job scan.", "error")
+        return redirect(url_for("index"))
+
+    return render_template("progress.html", job_id=job_id)
+
+
+@app.route("/scan/pause/<job_id>", methods=["POST"])
+def scan_pause(job_id: str):
+    if job_id in SCAN_JOBS and SCAN_JOBS[job_id].get("status") in {"running", "paused"}:
+        SCAN_JOBS[job_id]["paused"] = True
+        SCAN_JOBS[job_id]["status"] = "paused"
+        SCAN_JOBS[job_id]["logs"].append({
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "message": "Scan đã được tạm dừng",
+        })
+
+    return {"ok": True}
+
+
+@app.route("/scan/resume/<job_id>", methods=["POST"])
+def scan_resume(job_id: str):
+    if job_id in SCAN_JOBS and SCAN_JOBS[job_id].get("status") in {"paused", "running"}:
+        SCAN_JOBS[job_id]["paused"] = False
+        SCAN_JOBS[job_id]["status"] = "running"
+        SCAN_JOBS[job_id]["logs"].append({
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "message": "Scan tiếp tục chạy",
+        })
+
+    return {"ok": True}
+
+
+@app.route("/scan/stop/<job_id>", methods=["POST"])
+def scan_stop(job_id: str):
+    if job_id in SCAN_JOBS and SCAN_JOBS[job_id].get("status") not in {"done", "error", "stopped"}:
+        SCAN_JOBS[job_id]["stopped"] = True
+        SCAN_JOBS[job_id]["paused"] = False
+        SCAN_JOBS[job_id]["status"] = "stopping"
+        SCAN_JOBS[job_id]["logs"].append({
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "message": "Đang dừng scan và tạo partial report",
+        })
+
+    return {"ok": True}
 
 
 @app.route("/scan/result/<job_id>", methods=["GET"])
@@ -244,7 +517,8 @@ def scan_result(job_id: str):
         flash(f"Scan bị lỗi: {job.get('error', '')}", "error")
         return redirect(url_for("index"))
 
-    if job.get("status") != "done" or not job.get("result"):
+    if not job.get("result"):
+        flash("Scan chưa có kết quả. Vui lòng chờ hoặc dừng scan để tạo partial report.", "error")
         return redirect(url_for("index"))
 
     return render_template(

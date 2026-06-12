@@ -1,42 +1,643 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Markdown Report · Context Feedback Fuzzer{% endblock %}
 {% block content %}
 
-<div class="card">
-  <h2>📄 Markdown Report Viewer</h2>
+<div class="row g-4">
+  <div class="col-xl-3">
+    <div class="glass-card p-4 sticky-side">
+      <div class="badge badge-soft-blue mb-3">
+        <i class="ti ti-markdown me-1"></i>
+        Report Viewer v2.1
+      </div>
 
-  <p class="muted">
-    Trang này dùng để xem Markdown report dưới dạng dễ đọc hơn.
-    Report thể hiện kết quả context-aware và feedback-based fuzzing.
-  </p>
+      <h3 class="mb-2">Markdown Report</h3>
 
-  <p>
-    <b>File:</b>
-    <span class="mono">{{ filename }}</span>
-  </p>
+      <p class="text-muted-custom small mb-3">
+        Trang này render report thành dạng dashboard: fingerprint ranking, confirmed/possible
+        finding, confidence và marker verification.
+      </p>
 
-  <div style="margin-top:15px;">
-    <a class="btn secondary" href="{{ url_for('index') }}">
-      ← Quay lại
-    </a>
+      <div class="soft-card p-3 mb-3">
+        <div class="small text-muted-custom mb-1">File</div>
+        <div class="mono small text-break">{{ filename }}</div>
+      </div>
 
-    <a class="btn good" href="{{ url_for('download_report', filename=filename) }}">
-      ⬇ Tải Markdown
-    </a>
+      <div class="d-grid gap-2">
+        <a class="btn btn-outline-light" href="{{ url_for('index') }}">
+          <i class="ti ti-arrow-left me-1"></i>
+          Dashboard
+        </a>
+
+        <a class="btn btn-cff-success" href="{{ url_for('download_report', filename=filename) }}">
+          <i class="ti ti-download me-1"></i>
+          Tải Markdown
+        </a>
+
+        <button class="btn btn-outline-info" id="toggleRawBtn" type="button">
+          <i class="ti ti-code me-1"></i>
+          Raw Markdown
+        </button>
+      </div>
+
+      <div class="soft-card p-3 mt-3">
+        <div class="small text-muted-custom mb-2">Search findings</div>
+        <input id="findingSearch" class="form-control" placeholder="URL, marker, reason..." />
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-9">
+    <div class="glass-card p-4 mb-4">
+      <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+        <div>
+          <div class="badge badge-soft-purple mb-2">
+            <i class="ti ti-file-analytics me-1"></i>
+            Parsed report
+          </div>
+
+          <h2 class="mb-1">Tổng quan report</h2>
+
+          <p class="text-muted-custom mb-0">
+            Các finding được chia theo trạng thái <b>confirmed</b> và <b>possible</b>. Confirmed
+            nghĩa là có bằng chứng marker reflection/verification.
+          </p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge badge-soft-green">Confirmed</span>
+          <span class="badge badge-soft-yellow">Possible</span>
+          <span class="badge badge-soft-cyan">Marker-based</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="metric-grid mb-4" id="kpiBox">
+      <div class="metric-card">
+        <div class="metric-label">Requests</div>
+        <div class="metric-value" id="kpiRequests">0</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Confirmed</div>
+        <div class="metric-value text-success" id="kpiConfirmed">0</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Possible</div>
+        <div class="metric-value text-warning" id="kpiPossible">0</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Marker verified</div>
+        <div class="metric-value text-info" id="kpiMarkerVerified">0</div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+            <div>
+              <h2 class="mb-1">
+                <i class="ti ti-fingerprint me-2"></i>
+                Fingerprint ranking
+              </h2>
+              <p class="text-muted-custom mb-0">
+                Điểm chỉ dùng để chọn ngữ cảnh platform, không phải risk score.
+              </p>
+            </div>
+          </div>
+
+          <div id="fingerprintBox"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="glass-card p-4 h-100">
+          <h2 class="mb-3">
+            <i class="ti ti-chart-donut me-2"></i>
+            Confirmation overview
+          </h2>
+
+          <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+              <canvas id="confirmationChart" height="220"></canvas>
+            </div>
+
+            <div class="col-md-6">
+              <div class="soft-card p-3 mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted-custom">Confirmation rate</span>
+                  <b id="confirmationRateText">0%</b>
+                </div>
+                <div class="progress" style="height: 10px">
+                  <div
+                    id="confirmationRateBar"
+                    class="progress-bar progress-bar-confirmed"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="soft-card p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted-custom">Marker verification</span>
+                  <b id="markerRateText">0%</b>
+                </div>
+                <div class="progress" style="height: 10px">
+                  <div
+                    id="markerRateBar"
+                    class="progress-bar progress-bar-marker"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap mt-3">
+            <span class="badge badge-soft-blue" id="markerGeneratedBadge">Generated: 0</span>
+            <span class="badge badge-soft-cyan" id="markerVerifiedBadge">Verified: 0</span>
+            <span class="badge badge-soft-gray" id="crawledLinksBadge">Crawled: 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+        <div>
+          <h2 class="mb-1">
+            <i class="ti ti-bug me-2"></i>
+            Finding detail
+          </h2>
+
+          <p class="text-muted-custom mb-0">
+            Mỗi lần chỉ hiển thị một finding để dễ đọc. Dùng tìm kiếm hoặc nút trước/sau để chuyển.
+          </p>
+        </div>
+
+        <div class="soft-card p-3" style="min-width: 290px;">
+          <div class="small text-muted-custom mb-2">Finding navigation</div>
+
+          <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-outline-light btn-sm" id="prevFindingBtn" type="button">
+              <i class="ti ti-chevron-left"></i>
+            </button>
+
+            <div class="btn btn-outline-info btn-sm disabled flex-fill" id="findingCounter">
+              0 / 0
+            </div>
+
+            <button class="btn btn-outline-light btn-sm" id="nextFindingBtn" type="button">
+              <i class="ti ti-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap mb-3">
+        <select id="confirmationFilter" class="form-select" style="min-width: 190px">
+          <option value="all">Tất cả trạng thái</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="possible">Possible</option>
+        </select>
+
+        <select id="findingTypeFilter" class="form-select" style="min-width: 190px">
+          <option value="all">Tất cả loại finding</option>
+          <option value="sqli">SQL-like</option>
+          <option value="xss">Reflection/XSS</option>
+          <option value="redirect">Redirect</option>
+          <option value="path">Path/Input</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div id="findingViewer"></div>
+    </div>
+
+    <div class="glass-card p-4" id="rawSection" style="display: none">
+      <h2 class="mb-3">
+        <i class="ti ti-code me-2"></i>
+        Raw Markdown
+      </h2>
+
+      <pre class="json-box mono small">{{ content }}</pre>
+    </div>
   </div>
 </div>
 
+<textarea id="rawMarkdown" style="display: none">{{ content }}</textarea>
 
-<div class="card">
-  <h3>Nội dung report</h3>
+{% endblock %} {% block scripts %}
+<script>
+  const rawMarkdown = document.getElementById('rawMarkdown').value || '';
 
-  <p class="muted">
-    Lưu ý: Các finding trong report là giả thuyết nguy cơ bug dựa trên phản hồi server,
-    không phải xác nhận khai thác thành công và không phải chấm severity.
-  </p>
+  const fingerprintBox = document.getElementById('fingerprintBox');
+  const findingViewer = document.getElementById('findingViewer');
+  const findingCounter = document.getElementById('findingCounter');
+  const prevFindingBtn = document.getElementById('prevFindingBtn');
+  const nextFindingBtn = document.getElementById('nextFindingBtn');
+  const findingSearch = document.getElementById('findingSearch');
+  const toggleRawBtn = document.getElementById('toggleRawBtn');
+  const rawSection = document.getElementById('rawSection');
+  const confirmationFilter = document.getElementById('confirmationFilter');
+  const findingTypeFilter = document.getElementById('findingTypeFilter');
 
-  <div class="report-md">
-    <pre>{{ content }}</pre>
-  </div>
-</div>
+  function escapeHtml(text) {
+    return String(text || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
 
+  function extractSection(markdown, heading) {
+    const pattern = new RegExp(`## ${heading}\\n([\\s\\S]*?)(?=\\n## |$)`, 'i');
+    const match = markdown.match(pattern);
+    return match ? match[1].trim() : '';
+  }
+
+  function parseNumberFromLine(markdown, label) {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`-\\s*${escaped}:\\s*\`?([0-9.]+)%?\`?`, 'i');
+    const match = markdown.match(pattern);
+    return match ? Number(match[1]) || 0 : 0;
+  }
+
+  function parseReportStats() {
+    return {
+      requests: parseNumberFromLine(rawMarkdown, 'Requests sent'),
+      confirmed: parseNumberFromLine(rawMarkdown, 'Confirmed findings'),
+      possible: parseNumberFromLine(rawMarkdown, 'Possible findings'),
+      confirmationRate: parseNumberFromLine(rawMarkdown, 'Confirmation rate'),
+      markerVerified: parseNumberFromLine(rawMarkdown, 'Marker verified count'),
+      markerVerificationRate: parseNumberFromLine(rawMarkdown, 'Marker verification rate'),
+      markersGenerated: parseNumberFromLine(rawMarkdown, 'Markers generated'),
+      markersFailed: parseNumberFromLine(rawMarkdown, 'Markers failed'),
+      crawledLinks:
+        parseNumberFromLine(rawMarkdown, 'Crawled links for verification') ||
+        parseNumberFromLine(rawMarkdown, 'Crawled links'),
+    };
+  }
+
+  function classifyFindingType(text) {
+    const t = String(text || '').toLowerCase();
+
+    if (t.includes('sql')) return 'sqli';
+    if (t.includes('xss') || t.includes('reflection') || t.includes('reflected')) return 'xss';
+    if (t.includes('redirect')) return 'redirect';
+    if (t.includes('path') || t.includes('traversal')) return 'path';
+
+    return 'other';
+  }
+
+  function parseFindingMeta(md) {
+    const confirmationMatch = md.match(
+      /- Confirmation:\s*`?([^`|\n]+)`?\s*\|\s*Level:\s*`?([^`|\n]+)`?\s*\|\s*Confidence:\s*`?([0-9]+)`?/i
+    );
+    const markerMatch = md.match(
+      /- Marker:\s*`?([^`|\n]+)`?\s*\|\s*Reflected:\s*`?([^`|\n]+)`?\s*\|\s*Hits:\s*`?([0-9]+)`?/i
+    );
+    const urlMatch = md.match(/- URL:\s*`([^`]+)`/i);
+    const responseMatch = md.match(
+      /- Response:\s*HTTP\s*`?([0-9]+)`?\s*\/\s*Length\s*`?([0-9]+)`?\s*\/\s*Type\s*`?([^`\n]+)`?/i
+    );
+    const parameterMatch = md.match(/- Parameter:\s*`([^`]+)`\s*\|\s*Param type:\s*`([^`]+)`/i);
+    const payloadMatch = md.match(/- Payload type:\s*`([^`]+)`\s*\|\s*Payload:\s*`([^`]+)`/i);
+
+    const titleMatch = md.match(/^###\s+\d+\.\s+(.+)$/m);
+
+    return {
+      title: titleMatch ? titleMatch[1].trim() : 'Finding',
+      confirmation: confirmationMatch ? confirmationMatch[1].trim().toLowerCase() : 'possible',
+      confirmationLevel: confirmationMatch ? confirmationMatch[2].trim().toLowerCase() : 'possible',
+      confidence: confirmationMatch ? Number(confirmationMatch[3]) || 0 : 0,
+      marker: markerMatch ? markerMatch[1].trim() : '',
+      markerReflected: markerMatch ? markerMatch[2].trim() : '',
+      markerHits: markerMatch ? Number(markerMatch[3]) || 0 : 0,
+      url: urlMatch ? urlMatch[1].trim() : '',
+      status: responseMatch ? responseMatch[1].trim() : '',
+      length: responseMatch ? responseMatch[2].trim() : '',
+      contentType: responseMatch ? responseMatch[3].trim() : '',
+      parameter: parameterMatch ? parameterMatch[1].trim() : '',
+      paramType: parameterMatch ? parameterMatch[2].trim() : '',
+      payloadType: payloadMatch ? payloadMatch[1].trim() : '',
+      payload: payloadMatch ? payloadMatch[2].trim() : '',
+      type: classifyFindingType(md),
+    };
+  }
+
+  function renderKpis() {
+    const stats = parseReportStats();
+
+    document.getElementById('kpiRequests').innerText = window.CFF.formatNumber(stats.requests);
+    document.getElementById('kpiConfirmed').innerText = window.CFF.formatNumber(stats.confirmed);
+    document.getElementById('kpiPossible').innerText = window.CFF.formatNumber(stats.possible);
+    document.getElementById('kpiMarkerVerified').innerText = window.CFF.formatNumber(
+      stats.markerVerified
+    );
+
+    document.getElementById('confirmationRateText').innerText = `${stats.confirmationRate}%`;
+    document.getElementById('confirmationRateBar').style.width =
+      `${window.CFF.clampPercent(stats.confirmationRate)}%`;
+
+    document.getElementById('markerRateText').innerText = `${stats.markerVerificationRate}%`;
+    document.getElementById('markerRateBar').style.width =
+      `${window.CFF.clampPercent(stats.markerVerificationRate)}%`;
+
+    document.getElementById('markerGeneratedBadge').innerText =
+      `Generated: ${stats.markersGenerated}`;
+    document.getElementById('markerVerifiedBadge').innerText = `Verified: ${stats.markerVerified}`;
+    document.getElementById('crawledLinksBadge').innerText = `Crawled: ${stats.crawledLinks}`;
+
+    const chartEl = document.getElementById('confirmationChart');
+    if (chartEl) {
+      new Chart(chartEl, {
+        type: 'doughnut',
+        data: {
+          labels: ['Confirmed', 'Possible'],
+          datasets: [
+            {
+              data: [stats.confirmed, stats.possible],
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          cutout: '68%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#e5e7eb',
+                usePointStyle: true,
+                pointStyle: 'circle',
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  function renderFingerprintScores() {
+    const section = extractSection(rawMarkdown, 'Fingerprint scores');
+    const lines = section
+      .split('\n')
+      .map((x) => x.trim())
+      .filter(Boolean);
+
+    const scores = [];
+
+    lines.forEach((line) => {
+      const match = line.match(/^-?\s*([^:]+):\s*([0-9]+)/);
+      if (match) {
+        scores.push({
+          name: match[1].replace('-', '').trim(),
+          value: parseInt(match[2], 10),
+        });
+      }
+    });
+
+    scores.sort((a, b) => b.value - a.value);
+
+    if (!scores.length) {
+      fingerprintBox.innerHTML = `<div class="text-muted-custom">Không có dữ liệu fingerprint score.</div>`;
+      return;
+    }
+
+    const maxScore = Math.max(...scores.map((s) => s.value), 1);
+
+    fingerprintBox.innerHTML = scores
+      .map((item, index) => {
+        const percent = Math.round((item.value / maxScore) * 100);
+        const rankIcon =
+          index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+
+        return `
+          <div class="soft-card p-3 mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="fw-bold text-capitalize">
+                <span class="me-2">${rankIcon}</span>${escapeHtml(item.name)}
+              </div>
+              <span class="badge badge-soft-blue">${item.value}</span>
+            </div>
+
+            <div class="progress" style="height: 10px;">
+              <div class="progress-bar progress-bar-cff" style="width: ${percent}%;"></div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  function splitFindings(markdown) {
+    const findingsSection = extractSection(markdown, 'Findings');
+
+    if (!findingsSection) return [];
+
+    return findingsSection
+      .split(/\n(?=###\s+\d+\.\s+)/g)
+      .map((x) => x.trim())
+      .filter((x) => x.startsWith('###'))
+      .map((md, index) => ({
+        id: index + 1,
+        md,
+        meta: parseFindingMeta(md),
+        text: md.toLowerCase(),
+      }));
+  }
+
+  let allFindings = splitFindings(rawMarkdown);
+  let filteredFindings = [...allFindings];
+  let currentFindingIndex = 0;
+
+  function renderFinding() {
+    if (!filteredFindings.length) {
+      findingViewer.innerHTML = `
+        <div class="soft-card p-4 text-center text-muted-custom">
+          Không tìm thấy finding phù hợp.
+        </div>
+      `;
+
+      findingCounter.innerText = '0 / 0';
+      prevFindingBtn.disabled = true;
+      nextFindingBtn.disabled = true;
+      return;
+    }
+
+    if (currentFindingIndex < 0) currentFindingIndex = 0;
+    if (currentFindingIndex >= filteredFindings.length) {
+      currentFindingIndex = filteredFindings.length - 1;
+    }
+
+    const item = filteredFindings[currentFindingIndex];
+    const meta = item.meta;
+    const isConfirmed = meta.confirmation === 'confirmed';
+    const confirmationClass = isConfirmed ? 'confirmation-confirmed' : 'confirmation-possible';
+    const confirmationIcon = isConfirmed ? 'ti-shield-check' : 'ti-alert-triangle';
+    const findingCardClass = isConfirmed ? 'confirmed' : 'possible';
+
+    findingViewer.innerHTML = `
+      <div class="soft-card finding-card ${findingCardClass} ${meta.type} p-4">
+        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3">
+          <div>
+            <div class="d-flex gap-2 flex-wrap mb-2">
+              <span class="badge badge-soft-blue">#${item.id}</span>
+              <span class="confirmation-pill ${confirmationClass}">
+                <i class="ti ${confirmationIcon}"></i>
+                ${escapeHtml(meta.confirmation.toUpperCase())}
+              </span>
+              <span class="badge badge-soft-purple">${escapeHtml(meta.confirmationLevel)}</span>
+              <span class="badge badge-soft-cyan">${escapeHtml(meta.type)}</span>
+            </div>
+
+            <h2 class="mb-1">${escapeHtml(meta.title)}</h2>
+            <div class="mono small text-muted-custom text-break">${escapeHtml(meta.url || 'unknown url')}</div>
+          </div>
+
+          <div class="soft-card p-3" style="min-width: 180px;">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted-custom">Confidence</span>
+              <b>${meta.confidence}%</b>
+            </div>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="width: ${window.CFF.clampPercent(meta.confidence)}%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <div class="dark-card p-3 h-100">
+              <div class="small text-muted-custom">HTTP status</div>
+              <div class="h3 mb-0">${escapeHtml(meta.status || 'n/a')}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="dark-card p-3 h-100">
+              <div class="small text-muted-custom">Length</div>
+              <div class="h3 mb-0">${escapeHtml(meta.length || 'n/a')}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="dark-card p-3 h-100">
+              <div class="small text-muted-custom">Content-Type</div>
+              <div class="mono small text-break">${escapeHtml(meta.contentType || 'n/a')}</div>
+            </div>
+          </div>
+        </div>
+
+        ${
+          meta.marker
+            ? `
+        <div class="glass-card p-3 mb-3">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <div class="fw-bold">
+              <i class="ti ti-target-arrow me-1"></i>
+              Marker verification
+            </div>
+            <span class="badge ${meta.markerHits > 0 ? 'badge-soft-green' : 'badge-soft-yellow'}">
+              Hits: ${meta.markerHits}
+            </span>
+          </div>
+          <div class="mono small text-break mb-2">${escapeHtml(meta.marker)}</div>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge badge-soft-blue">Reflected: ${escapeHtml(meta.markerReflected)}</span>
+            <span class="badge badge-soft-cyan">Verification engine</span>
+          </div>
+        </div>
+        `
+            : ''
+        }
+
+        ${
+          meta.parameter || meta.payload
+            ? `
+        <div class="row g-3 mb-3">
+          <div class="col-lg-6">
+            <div class="dark-card p-3 h-100">
+              <div class="fw-bold mb-2">Parameter</div>
+              <div class="mono small">Name: ${escapeHtml(meta.parameter || 'n/a')}</div>
+              <div class="mono small">Type: ${escapeHtml(meta.paramType || 'n/a')}</div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="dark-card p-3 h-100">
+              <div class="fw-bold mb-2">Payload</div>
+              <div class="mono small">Type: ${escapeHtml(meta.payloadType || 'n/a')}</div>
+              <div class="mono small text-break">${escapeHtml(meta.payload || 'n/a')}</div>
+            </div>
+          </div>
+        </div>
+        `
+            : ''
+        }
+
+        <div class="report-md-rendered">
+          ${marked.parse(item.md)}
+        </div>
+      </div>
+    `;
+
+    findingCounter.innerText = `${currentFindingIndex + 1} / ${filteredFindings.length}`;
+    prevFindingBtn.disabled = currentFindingIndex === 0;
+    nextFindingBtn.disabled = currentFindingIndex === filteredFindings.length - 1;
+
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block);
+    });
+  }
+
+  function applyFindingFilters() {
+    const keyword = findingSearch.value.toLowerCase().trim();
+    const confirmation = confirmationFilter.value;
+    const type = findingTypeFilter.value;
+
+    filteredFindings = allFindings.filter((item) => {
+      const matchKeyword = !keyword || item.text.includes(keyword);
+      const matchConfirmation = confirmation === 'all' || item.meta.confirmation === confirmation;
+      const matchType = type === 'all' || item.meta.type === type;
+
+      return matchKeyword && matchConfirmation && matchType;
+    });
+
+    currentFindingIndex = 0;
+    renderFinding();
+  }
+
+  prevFindingBtn.addEventListener('click', function () {
+    if (currentFindingIndex > 0) {
+      currentFindingIndex--;
+      renderFinding();
+    }
+  });
+
+  nextFindingBtn.addEventListener('click', function () {
+    if (currentFindingIndex < filteredFindings.length - 1) {
+      currentFindingIndex++;
+      renderFinding();
+    }
+  });
+
+  findingSearch.addEventListener('input', applyFindingFilters);
+  confirmationFilter.addEventListener('change', applyFindingFilters);
+  findingTypeFilter.addEventListener('change', applyFindingFilters);
+
+  toggleRawBtn.addEventListener('click', function () {
+    if (rawSection.style.display === 'none') {
+      rawSection.style.display = 'block';
+      toggleRawBtn.innerHTML = `<i class="ti ti-eye-off me-1"></i>Ẩn Raw`;
+    } else {
+      rawSection.style.display = 'none';
+      toggleRawBtn.innerHTML = `<i class="ti ti-code me-1"></i>Raw Markdown`;
+    }
+  });
+
+  renderKpis();
+  renderFingerprintScores();
+  renderFinding();
+</script>
 {% endblock %}
