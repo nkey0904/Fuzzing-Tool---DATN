@@ -254,7 +254,7 @@ def scan_start():
     try:
         threads = int(request.form.get("threads", "4"))
         delay = float(request.form.get("delay", "0.15"))
-        max_requests = int(request.form.get("max_requests", "400"))
+        max_requests = int(request.form.get("max_requests", "1000"))
         timeout = float(request.form.get("timeout", "8"))
     except ValueError:
         flash("Threads, delay, timeout và max_requests phải là số hợp lệ.", "error")

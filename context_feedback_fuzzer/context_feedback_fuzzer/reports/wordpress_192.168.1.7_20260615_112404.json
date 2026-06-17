@@ -1,0 +1,2628 @@
+{
+  "tool": "Context Feedback Fuzzer v2.1 - Hybrid Fuzzer (Static + Selenium) - authorized testing only",
+  "target": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test#/",
+  "started_utc": "2026-06-15T04:23:35.145779+00:00",
+  "finished_utc": "2026-06-15T04:24:04.748063+00:00",
+  "scan_status": "done",
+  "detected_platform": "wordpress",
+  "detected_cms": "wordpress",
+  "platform_type": "CMS",
+  "fingerprint_scores": {
+    "wordpress": 0,
+    "joomla": 0,
+    "drupal": 0,
+    "liferay": 0,
+    "sharepoint": 0,
+    "moodle": 0
+  },
+  "detected_stack": {
+    "language": "php",
+    "server": "apache",
+    "extensions": [
+      ".php",
+      ".php.bak",
+      ".php.old"
+    ]
+  },
+  "generated_wordlist_info": {
+    "path_sources": [
+      "wordpress.fuzz.txt",
+      "wp-plugins.fuzz.txt",
+      "wp-themes.fuzz.txt",
+      "urls-wordpress-3.3.1.txt"
+    ],
+    "server_extensions": [
+      ".php",
+      ".php.bak",
+      ".php.old"
+    ],
+    "parameter_strategy": {
+      "p": "numeric",
+      "page_id": "numeric",
+      "cat": "numeric",
+      "search": "text",
+      "s": "text",
+      "author": "numeric",
+      "action": "action",
+      "nonce": "generic",
+      "redirect_to": "redirect",
+      "log": "text",
+      "pwd": "generic",
+      "name": "text"
+    },
+    "payload_strategy": {
+      "p": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "page_id": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "cat": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "search": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_trigger_probe",
+        "xss_trigger_probe",
+        "sqli_probe"
+      ],
+      "s": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_trigger_probe",
+        "xss_trigger_probe",
+        "sqli_probe"
+      ],
+      "author": [
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "numeric_boundary",
+        "sqli_probe",
+        "sqli_probe"
+      ],
+      "action": [
+        "action_canary",
+        "text_canary",
+        "sqli_probe"
+      ],
+      "nonce": [
+        "generic_canary",
+        "generic_bool",
+        "generic_number",
+        "sqli_probe"
+      ],
+      "redirect_to": [
+        "redirect_probe",
+        "redirect_probe"
+      ],
+      "log": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_trigger_probe",
+        "xss_trigger_probe",
+        "sqli_probe"
+      ],
+      "pwd": [
+        "generic_canary",
+        "generic_bool",
+        "generic_number",
+        "sqli_probe"
+      ],
+      "name": [
+        "text_canary",
+        "xss_reflection_probe",
+        "xss_trigger_probe",
+        "xss_trigger_probe",
+        "sqli_probe"
+      ]
+    },
+    "marker_based_fuzzing": {
+      "enabled": true,
+      "description": "Each payload is tagged with a unique marker, then a verification engine re-checks collected pages for marker reflection.",
+      "markers_generated": 114,
+      "markers_verified": 0,
+      "confirmed_markers": [
+        {
+          "marker": "cff_marker_name_text_canary_7b42f46810",
+          "param": "name",
+          "param_type": "text",
+          "payload_type": "text_canary",
+          "payload": "cff_marker_name_text_canary_7b42f46810",
+          "source_url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+          "hits": [
+            {
+              "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+              "status": 200,
+              "length": 4803,
+              "source": "immediate_response"
+            }
+          ]
+        },
+        {
+          "marker": "cff_marker_name_xss_reflection_probe_b48a7507ae",
+          "param": "name",
+          "param_type": "text",
+          "payload_type": "xss_reflection_probe",
+          "payload": "<cff_marker_name_xss_reflection_probe_b48a7507ae>",
+          "source_url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+          "hits": [
+            {
+              "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+              "status": 200,
+              "length": 4814,
+              "source": "immediate_response"
+            }
+          ]
+        }
+      ],
+      "verification_pages": [
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%27_cff_marker_p_sqli_probe_51582b41c5",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%22_cff_marker_p_sqli_probe_e9a1d576c5",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%27_cff_marker_page_id_sqli_probe_19977e154a",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%22_cff_marker_page_id_sqli_probe_5e8f342864",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%27_cff_marker_cat_sqli_probe_0907494ba1",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%22_cff_marker_cat_sqli_probe_988310d529",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%27_cff_marker_search_sqli_probe_7bf6f01a2a",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%27_cff_marker_s_sqli_probe_d717a6b6fe",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%27_cff_marker_author_sqli_probe_1fe818acaa",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%22_cff_marker_author_sqli_probe_70d2574acd",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=%27_cff_marker_action_sqli_probe_f227d1495e",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=%27_cff_marker_nonce_sqli_probe_db6bb1b8fa",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%27_cff_marker_log_sqli_probe_8c9ff551dc",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=%27_cff_marker_pwd_sqli_probe_63aed55686",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1_cff_marker_p_numeric_boundary_1e196f3de0",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=0_cff_marker_p_numeric_boundary_fae88e63db",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=-1_cff_marker_p_numeric_boundary_257b208d53",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=999999_cff_marker_p_numeric_boundary_51a08f5be7",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1_cff_marker_page_id_numeric_boundary_fd09ea7b1c",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=0_cff_marker_page_id_numeric_boundary_36dcf70d7e",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=-1_cff_marker_page_id_numeric_boundary_bfd8f971eb",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=999999_cff_marker_page_id_numeric_boundary_fdb51cd1a5",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1_cff_marker_cat_numeric_boundary_c927b0be88",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=0_cff_marker_cat_numeric_boundary_13a38f00e3",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=-1_cff_marker_cat_numeric_boundary_48cf424a5a",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=999999_cff_marker_cat_numeric_boundary_ebd91b14bf",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=cff_marker_search_text_canary_30183de286",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Ccff_marker_search_xss_reflection_probe_c594603d32%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cscript%3Ealert%28%27cff_marker_search_xss_trigger_probe_53f7791371%27%29%3C%2Fscript%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_search_xss_trigger_probe_5185060049%27%29%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=cff_marker_s_text_canary_d398ca9619",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Ccff_marker_s_xss_reflection_probe_c07be3b42b%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cscript%3Ealert%28%27cff_marker_s_xss_trigger_probe_41ecce83e8%27%29%3C%2Fscript%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_s_xss_trigger_probe_ddd59b3973%27%29%3E",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1_cff_marker_author_numeric_boundary_4db85acd10",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=0_cff_marker_author_numeric_boundary_0f2d6f04a8",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=-1_cff_marker_author_numeric_boundary_54d81c3382",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/align-left-2x.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?name=%27_cff_marker_name_sqli_probe_1b39b2a123",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/comment-grey-bubble-2x.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/list-vs.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?author=1%22_cff_marker_author_sqli_probe_307e0ded53",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/login.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/color-picker-rtl.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/plugin-install-rtl.dev.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?log=cff_marker_log_text_canary_0f0908ecde",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?nonce=cff_marker_nonce_generic_canary_56e1a6a78a",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/nav-menu-rtl.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/resize-2x.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?action=%27_cff_marker_action_sqli_probe_0fdf7a7910",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?pwd=true_cff_marker_pwd_generic_bool_9c06f44b83",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?action=cff_marker_action_action_canary_5d0c46859e",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-form-advanced.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?page_id=999999_cff_marker_page_id_numeric_boundary_a6b842f49a",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/widgets.dev.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=cff_marker_action_action_canary_ddc6b1c8f4",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/loading.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/post-formats.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/ed-bg-vs.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-comments.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/api.php.bak",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/press-this-rtl.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/press-this.css",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-content/uploads/",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=invalid_action_cff_marker_action_text_canary_df807ed0e1",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-category-form.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-link-form.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/bookmarklet.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/search.php",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/loading-publish.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/icons32-2x.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/menu-shadow.png",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/bubble_bg-rtl-2x.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/menu-bits-rtl-vs.gif",
+          "source": "marker_verification_candidate"
+        },
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/toggle-arrow-rtl.gif",
+          "source": "marker_verification_candidate"
+        }
+      ],
+      "markers_failed": 114,
+      "marker_verification_rate": 0.0,
+      "crawled_links_count": 80
+    }
+  },
+  "marker_based_fuzzing": {
+    "enabled": true,
+    "markers_generated": 114,
+    "marker_verified_count": 0,
+    "markers_failed": 114,
+    "marker_verification_rate": 0.0,
+    "crawled_links_count": 80,
+    "confirmed_markers": [
+      {
+        "marker": "cff_marker_name_text_canary_7b42f46810",
+        "param": "name",
+        "param_type": "text",
+        "payload_type": "text_canary",
+        "payload": "cff_marker_name_text_canary_7b42f46810",
+        "source_url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+        "hits": [
+          {
+            "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+            "status": 200,
+            "length": 4803,
+            "source": "immediate_response"
+          }
+        ]
+      },
+      {
+        "marker": "cff_marker_name_xss_reflection_probe_b48a7507ae",
+        "param": "name",
+        "param_type": "text",
+        "payload_type": "xss_reflection_probe",
+        "payload": "<cff_marker_name_xss_reflection_probe_b48a7507ae>",
+        "source_url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+        "hits": [
+          {
+            "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+            "status": 200,
+            "length": 4814,
+            "source": "immediate_response"
+          }
+        ]
+      }
+    ],
+    "verification_pages": [
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%27_cff_marker_p_sqli_probe_51582b41c5",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%22_cff_marker_p_sqli_probe_e9a1d576c5",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%27_cff_marker_page_id_sqli_probe_19977e154a",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%22_cff_marker_page_id_sqli_probe_5e8f342864",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%27_cff_marker_cat_sqli_probe_0907494ba1",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%22_cff_marker_cat_sqli_probe_988310d529",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%27_cff_marker_search_sqli_probe_7bf6f01a2a",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%27_cff_marker_s_sqli_probe_d717a6b6fe",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%27_cff_marker_author_sqli_probe_1fe818acaa",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%22_cff_marker_author_sqli_probe_70d2574acd",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=%27_cff_marker_action_sqli_probe_f227d1495e",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=%27_cff_marker_nonce_sqli_probe_db6bb1b8fa",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%27_cff_marker_log_sqli_probe_8c9ff551dc",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=%27_cff_marker_pwd_sqli_probe_63aed55686",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1_cff_marker_p_numeric_boundary_1e196f3de0",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=0_cff_marker_p_numeric_boundary_fae88e63db",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=-1_cff_marker_p_numeric_boundary_257b208d53",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=999999_cff_marker_p_numeric_boundary_51a08f5be7",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1_cff_marker_page_id_numeric_boundary_fd09ea7b1c",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=0_cff_marker_page_id_numeric_boundary_36dcf70d7e",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=-1_cff_marker_page_id_numeric_boundary_bfd8f971eb",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=999999_cff_marker_page_id_numeric_boundary_fdb51cd1a5",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1_cff_marker_cat_numeric_boundary_c927b0be88",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=0_cff_marker_cat_numeric_boundary_13a38f00e3",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=-1_cff_marker_cat_numeric_boundary_48cf424a5a",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=999999_cff_marker_cat_numeric_boundary_ebd91b14bf",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=cff_marker_search_text_canary_30183de286",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Ccff_marker_search_xss_reflection_probe_c594603d32%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cscript%3Ealert%28%27cff_marker_search_xss_trigger_probe_53f7791371%27%29%3C%2Fscript%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_search_xss_trigger_probe_5185060049%27%29%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=cff_marker_s_text_canary_d398ca9619",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Ccff_marker_s_xss_reflection_probe_c07be3b42b%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cscript%3Ealert%28%27cff_marker_s_xss_trigger_probe_41ecce83e8%27%29%3C%2Fscript%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_s_xss_trigger_probe_ddd59b3973%27%29%3E",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1_cff_marker_author_numeric_boundary_4db85acd10",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=0_cff_marker_author_numeric_boundary_0f2d6f04a8",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=-1_cff_marker_author_numeric_boundary_54d81c3382",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/align-left-2x.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?name=%27_cff_marker_name_sqli_probe_1b39b2a123",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/comment-grey-bubble-2x.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/list-vs.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?author=1%22_cff_marker_author_sqli_probe_307e0ded53",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/login.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/color-picker-rtl.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/plugin-install-rtl.dev.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?log=cff_marker_log_text_canary_0f0908ecde",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?nonce=cff_marker_nonce_generic_canary_56e1a6a78a",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/nav-menu-rtl.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/resize-2x.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?action=%27_cff_marker_action_sqli_probe_0fdf7a7910",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?pwd=true_cff_marker_pwd_generic_bool_9c06f44b83",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?action=cff_marker_action_action_canary_5d0c46859e",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-form-advanced.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php?page_id=999999_cff_marker_page_id_numeric_boundary_a6b842f49a",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/widgets.dev.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=cff_marker_action_action_canary_ddc6b1c8f4",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/loading.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/post-formats.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/ed-bg-vs.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-comments.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/api.php.bak",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/press-this-rtl.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/css/press-this.css",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-content/uploads/",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=invalid_action_cff_marker_action_text_canary_df807ed0e1",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-category-form.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/edit-link-form.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/bookmarklet.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/search.php",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/loading-publish.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/icons32-2x.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/menu-shadow.png",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/bubble_bg-rtl-2x.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/menu-bits-rtl-vs.gif",
+        "source": "marker_verification_candidate"
+      },
+      {
+        "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/wp-admin/images/toggle-arrow-rtl.gif",
+        "source": "marker_verification_candidate"
+      }
+    ]
+  },
+  "confirmation_summary": {
+    "confirmed_findings_count": 2,
+    "possible_findings_count": 53,
+    "confirmation_rate": 3.64,
+    "marker_verified_count": 0,
+    "markers_failed": 114,
+    "marker_verification_rate": 0.0,
+    "crawled_links_count": 80,
+    "markers_generated": 114
+  },
+  "confirmed_findings_count": 2,
+  "possible_findings_count": 53,
+  "confirmation_rate": 3.64,
+  "marker_verified_count": 0,
+  "markers_failed": 114,
+  "marker_verification_rate": 0.0,
+  "crawled_links_count": 80,
+  "requests_sent": 400,
+  "safety": {
+    "authorization_required": true,
+    "methods": [
+      "GET"
+    ],
+    "max_requests": 400,
+    "delay_seconds": 0.15,
+    "scope_host": "192.168.1.7"
+  },
+  "findings": [
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4803,
+      "content_type": "text/html;charset=utf-8",
+      "score": 47,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; marker reflected: cff_marker_name_text_canary_7b42f46810; marker hits: 1; unique marker reflected: cff_marker_name_text_canary_7b42f46810",
+      "vulnerability_type": "Marker-based Input Reflection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Marker-based Input Reflection",
+      "parameter": "name",
+      "param_type": "text",
+      "payload_type": "text_canary",
+      "payload": "cff_marker_name_text_canary_7b42f46810",
+      "evidence": "unique marker reflected: cff_marker_name_text_canary_7b42f46810",
+      "marker": "cff_marker_name_text_canary_7b42f46810",
+      "marker_reflected": true,
+      "marker_hits": [
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+          "status": 200,
+          "length": 4803,
+          "source": "immediate_response"
+        }
+      ],
+      "confirmation": "confirmed",
+      "confirmation_reason": "Marker duy nhất được phản chiếu trong response hoặc JS được kích hoạt.",
+      "verification_pages": [
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=cff_marker_name_text_canary_7b42f46810#/",
+          "status": 200,
+          "length": 4803,
+          "source": "immediate_response"
+        }
+      ],
+      "confirmation_level": "verified_reflection",
+      "confidence": 95,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "f74f1c59d7907d57772b13600ee29c81b1c421c2",
+      "bug_hypothesis": "Marker-based Input Reflection",
+      "evidence_summary": "unique marker reflected: cff_marker_name_text_canary_7b42f46810",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4814,
+      "content_type": "text/html;charset=utf-8",
+      "score": 37,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; marker reflected: cff_marker_name_xss_reflection_probe_b48a7507ae; marker hits: 1; Dangerous characters (<, \") survived encoding.",
+      "vulnerability_type": "Unescaped Payload Reflection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Unescaped Payload Reflection",
+      "parameter": "name",
+      "param_type": "text",
+      "payload_type": "xss_reflection_probe",
+      "payload": "<cff_marker_name_xss_reflection_probe_b48a7507ae>",
+      "evidence": "Dangerous characters (<, \") survived encoding.",
+      "marker": "cff_marker_name_xss_reflection_probe_b48a7507ae",
+      "marker_reflected": true,
+      "marker_hits": [
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+          "status": 200,
+          "length": 4814,
+          "source": "immediate_response"
+        }
+      ],
+      "confirmation": "confirmed",
+      "confirmation_reason": "Marker duy nhất được phản chiếu trong response hoặc JS được kích hoạt.",
+      "verification_pages": [
+        {
+          "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=%3Ccff_marker_name_xss_reflection_probe_b48a7507ae%3E#/",
+          "status": 200,
+          "length": 4814,
+          "source": "immediate_response"
+        }
+      ],
+      "confirmation_level": "verified_reflection",
+      "confidence": 95,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "8e1361f4387ec2205859643109a89be18c7b04dd",
+      "bug_hypothesis": "Unescaped Payload Reflection",
+      "evidence_summary": "Dangerous characters (<, \") survived encoding.",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=%27_cff_marker_action_sqli_probe_f227d1495e#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "action",
+      "param_type": "action",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_action_sqli_probe_f227d1495e",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_action_sqli_probe_f227d1495e",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%22_cff_marker_author_sqli_probe_70d2574acd#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1\"_cff_marker_author_sqli_probe_70d2574acd",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_author_sqli_probe_70d2574acd",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1%27_cff_marker_author_sqli_probe_1fe818acaa#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1'_cff_marker_author_sqli_probe_1fe818acaa",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_author_sqli_probe_1fe818acaa",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%22_cff_marker_cat_sqli_probe_988310d529#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1\"_cff_marker_cat_sqli_probe_988310d529",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_cat_sqli_probe_988310d529",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1%27_cff_marker_cat_sqli_probe_0907494ba1#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1'_cff_marker_cat_sqli_probe_0907494ba1",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_cat_sqli_probe_0907494ba1",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%27_cff_marker_log_sqli_probe_8c9ff551dc#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "log",
+      "param_type": "text",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_log_sqli_probe_8c9ff551dc",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_log_sqli_probe_8c9ff551dc",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=%27_cff_marker_nonce_sqli_probe_db6bb1b8fa#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "nonce",
+      "param_type": "generic",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_nonce_sqli_probe_db6bb1b8fa",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_nonce_sqli_probe_db6bb1b8fa",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%22_cff_marker_p_sqli_probe_e9a1d576c5#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1\"_cff_marker_p_sqli_probe_e9a1d576c5",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_p_sqli_probe_e9a1d576c5",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1%27_cff_marker_p_sqli_probe_51582b41c5#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1'_cff_marker_p_sqli_probe_51582b41c5",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_p_sqli_probe_51582b41c5",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%22_cff_marker_page_id_sqli_probe_5e8f342864#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1\"_cff_marker_page_id_sqli_probe_5e8f342864",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_page_id_sqli_probe_5e8f342864",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1%27_cff_marker_page_id_sqli_probe_19977e154a#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "sqli_probe",
+      "payload": "1'_cff_marker_page_id_sqli_probe_19977e154a",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_page_id_sqli_probe_19977e154a",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=%27_cff_marker_pwd_sqli_probe_63aed55686#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "pwd",
+      "param_type": "generic",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_pwd_sqli_probe_63aed55686",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_pwd_sqli_probe_63aed55686",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%27_cff_marker_s_sqli_probe_d717a6b6fe#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "s",
+      "param_type": "text",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_s_sqli_probe_d717a6b6fe",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_s_sqli_probe_d717a6b6fe",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%27_cff_marker_search_sqli_probe_7bf6f01a2a#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 44,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape; SQL-like error keyword appeared in response",
+      "vulnerability_type": "Possible SQL Injection",
+      "conclusion": "Có dấu hiệu/nguy cơ: Possible SQL Injection",
+      "parameter": "search",
+      "param_type": "text",
+      "payload_type": "sqli_probe",
+      "payload": "'_cff_marker_search_sqli_probe_7bf6f01a2a",
+      "evidence": "SQL-like error keyword appeared in response",
+      "marker": "cff_marker_search_sqli_probe_7bf6f01a2a",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 70,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Possible SQL Injection",
+      "evidence_summary": "SQL-like error keyword appeared in response",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=cff_marker_action_action_canary_ddc6b1c8f4#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "action",
+      "param_type": "action",
+      "payload_type": "action_canary",
+      "payload": "cff_marker_action_action_canary_ddc6b1c8f4",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_action_action_canary_ddc6b1c8f4",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&action=invalid_action_cff_marker_action_text_canary_df807ed0e1#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "action",
+      "param_type": "action",
+      "payload_type": "text_canary",
+      "payload": "invalid_action_cff_marker_action_text_canary_df807ed0e1",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_action_text_canary_df807ed0e1",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=-1_cff_marker_author_numeric_boundary_54d81c3382#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "-1_cff_marker_author_numeric_boundary_54d81c3382",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_author_numeric_boundary_54d81c3382",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=0_cff_marker_author_numeric_boundary_0f2d6f04a8#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "0_cff_marker_author_numeric_boundary_0f2d6f04a8",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_author_numeric_boundary_0f2d6f04a8",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=1_cff_marker_author_numeric_boundary_4db85acd10#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "1_cff_marker_author_numeric_boundary_4db85acd10",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_author_numeric_boundary_4db85acd10",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&author=999999_cff_marker_author_numeric_boundary_a3d32e94f0#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "author",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "999999_cff_marker_author_numeric_boundary_a3d32e94f0",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_author_numeric_boundary_a3d32e94f0",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=-1_cff_marker_cat_numeric_boundary_48cf424a5a#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "-1_cff_marker_cat_numeric_boundary_48cf424a5a",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_cat_numeric_boundary_48cf424a5a",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=0_cff_marker_cat_numeric_boundary_13a38f00e3#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "0_cff_marker_cat_numeric_boundary_13a38f00e3",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_cat_numeric_boundary_13a38f00e3",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=1_cff_marker_cat_numeric_boundary_c927b0be88#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "1_cff_marker_cat_numeric_boundary_c927b0be88",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_cat_numeric_boundary_c927b0be88",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&cat=999999_cff_marker_cat_numeric_boundary_ebd91b14bf#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "cat",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "999999_cff_marker_cat_numeric_boundary_ebd91b14bf",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_cat_numeric_boundary_ebd91b14bf",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%3Ccff_marker_log_xss_reflection_probe_98ca5a157a%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "log",
+      "param_type": "text",
+      "payload_type": "xss_reflection_probe",
+      "payload": "<cff_marker_log_xss_reflection_probe_98ca5a157a>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_log_xss_reflection_probe_98ca5a157a",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_log_xss_trigger_probe_c21e6c420f%27%29%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "log",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<img src=x onerror=alert('cff_marker_log_xss_trigger_probe_c21e6c420f')>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_log_xss_trigger_probe_c21e6c420f",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=%3Cscript%3Ealert%28%27cff_marker_log_xss_trigger_probe_7c878a441b%27%29%3C%2Fscript%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "log",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<script>alert('cff_marker_log_xss_trigger_probe_7c878a441b')</script>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_log_xss_trigger_probe_7c878a441b",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&log=cff_marker_log_text_canary_2e12f9c072#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "log",
+      "param_type": "text",
+      "payload_type": "text_canary",
+      "payload": "cff_marker_log_text_canary_2e12f9c072",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_log_text_canary_2e12f9c072",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=12345_cff_marker_nonce_generic_number_0c867a17d2#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "nonce",
+      "param_type": "generic",
+      "payload_type": "generic_number",
+      "payload": "12345_cff_marker_nonce_generic_number_0c867a17d2",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_nonce_generic_number_0c867a17d2",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=cff_marker_nonce_generic_canary_d6d9d7fd43#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "nonce",
+      "param_type": "generic",
+      "payload_type": "generic_canary",
+      "payload": "cff_marker_nonce_generic_canary_d6d9d7fd43",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_nonce_generic_canary_d6d9d7fd43",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&nonce=true_cff_marker_nonce_generic_bool_2f5492f92e#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "nonce",
+      "param_type": "generic",
+      "payload_type": "generic_bool",
+      "payload": "true_cff_marker_nonce_generic_bool_2f5492f92e",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_nonce_generic_bool_2f5492f92e",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=-1_cff_marker_p_numeric_boundary_257b208d53#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "-1_cff_marker_p_numeric_boundary_257b208d53",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_p_numeric_boundary_257b208d53",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=0_cff_marker_p_numeric_boundary_fae88e63db#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "0_cff_marker_p_numeric_boundary_fae88e63db",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_p_numeric_boundary_fae88e63db",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=1_cff_marker_p_numeric_boundary_1e196f3de0#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "1_cff_marker_p_numeric_boundary_1e196f3de0",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_p_numeric_boundary_1e196f3de0",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&p=999999_cff_marker_p_numeric_boundary_51a08f5be7#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "p",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "999999_cff_marker_p_numeric_boundary_51a08f5be7",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_p_numeric_boundary_51a08f5be7",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=-1_cff_marker_page_id_numeric_boundary_bfd8f971eb#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "-1_cff_marker_page_id_numeric_boundary_bfd8f971eb",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_page_id_numeric_boundary_bfd8f971eb",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=0_cff_marker_page_id_numeric_boundary_36dcf70d7e#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "0_cff_marker_page_id_numeric_boundary_36dcf70d7e",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_page_id_numeric_boundary_36dcf70d7e",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=1_cff_marker_page_id_numeric_boundary_fd09ea7b1c#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "1_cff_marker_page_id_numeric_boundary_fd09ea7b1c",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_page_id_numeric_boundary_fd09ea7b1c",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&page_id=999999_cff_marker_page_id_numeric_boundary_fdb51cd1a5#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "page_id",
+      "param_type": "numeric",
+      "payload_type": "numeric_boundary",
+      "payload": "999999_cff_marker_page_id_numeric_boundary_fdb51cd1a5",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_page_id_numeric_boundary_fdb51cd1a5",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=12345_cff_marker_pwd_generic_number_5585a67d77#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "pwd",
+      "param_type": "generic",
+      "payload_type": "generic_number",
+      "payload": "12345_cff_marker_pwd_generic_number_5585a67d77",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_pwd_generic_number_5585a67d77",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=cff_marker_pwd_generic_canary_a593bcd70d#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "pwd",
+      "param_type": "generic",
+      "payload_type": "generic_canary",
+      "payload": "cff_marker_pwd_generic_canary_a593bcd70d",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_pwd_generic_canary_a593bcd70d",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&pwd=true_cff_marker_pwd_generic_bool_dcb5495ae0#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "pwd",
+      "param_type": "generic",
+      "payload_type": "generic_bool",
+      "payload": "true_cff_marker_pwd_generic_bool_dcb5495ae0",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_pwd_generic_bool_dcb5495ae0",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&redirect_to=%2F%2Fexample.com%2Fcff_marker_redirect_to_redirect_probe_44ae83289a#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "redirect_to",
+      "param_type": "redirect",
+      "payload_type": "redirect_probe",
+      "payload": "//example.com/cff_marker_redirect_to_redirect_probe_44ae83289a",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_redirect_to_redirect_probe_44ae83289a",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&redirect_to=https%3A%2F%2Fexample.com%2Fcff_marker_redirect_to_redirect_probe_f25c6a83f0#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "redirect_to",
+      "param_type": "redirect",
+      "payload_type": "redirect_probe",
+      "payload": "https://example.com/cff_marker_redirect_to_redirect_probe_f25c6a83f0",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_redirect_to_redirect_probe_f25c6a83f0",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Ccff_marker_s_xss_reflection_probe_c07be3b42b%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "s",
+      "param_type": "text",
+      "payload_type": "xss_reflection_probe",
+      "payload": "<cff_marker_s_xss_reflection_probe_c07be3b42b>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_s_xss_reflection_probe_c07be3b42b",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_s_xss_trigger_probe_ddd59b3973%27%29%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "s",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<img src=x onerror=alert('cff_marker_s_xss_trigger_probe_ddd59b3973')>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_s_xss_trigger_probe_ddd59b3973",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=%3Cscript%3Ealert%28%27cff_marker_s_xss_trigger_probe_41ecce83e8%27%29%3C%2Fscript%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "s",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<script>alert('cff_marker_s_xss_trigger_probe_41ecce83e8')</script>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_s_xss_trigger_probe_41ecce83e8",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&s=cff_marker_s_text_canary_d398ca9619#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "s",
+      "param_type": "text",
+      "payload_type": "text_canary",
+      "payload": "cff_marker_s_text_canary_d398ca9619",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_s_text_canary_d398ca9619",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Ccff_marker_search_xss_reflection_probe_c594603d32%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "search",
+      "param_type": "text",
+      "payload_type": "xss_reflection_probe",
+      "payload": "<cff_marker_search_xss_reflection_probe_c594603d32>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_search_xss_reflection_probe_c594603d32",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cimg+src%3Dx+onerror%3Dalert%28%27cff_marker_search_xss_trigger_probe_5185060049%27%29%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "search",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<img src=x onerror=alert('cff_marker_search_xss_trigger_probe_5185060049')>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_search_xss_trigger_probe_5185060049",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=%3Cscript%3Ealert%28%27cff_marker_search_xss_trigger_probe_53f7791371%27%29%3C%2Fscript%3E#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "search",
+      "param_type": "text",
+      "payload_type": "xss_trigger_probe",
+      "payload": "<script>alert('cff_marker_search_xss_trigger_probe_53f7791371')</script>",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_search_xss_trigger_probe_53f7791371",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "parameter",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/?name=test&search=cff_marker_search_text_canary_30183de286#/",
+      "method": "GET",
+      "status": 200,
+      "length": 4769,
+      "content_type": "text/html;charset=utf-8",
+      "score": 22,
+      "reason": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "vulnerability_type": "Parameter behavior anomaly",
+      "conclusion": "Có dấu hiệu phản hồi bất thường khi fuzz parameter",
+      "parameter": "search",
+      "param_type": "text",
+      "payload_type": "text_canary",
+      "payload": "cff_marker_search_text_canary_30183de286",
+      "evidence": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "marker": "cff_marker_search_text_canary_30183de286",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Chưa có marker xác nhận; finding dựa trên feedback/anomaly của response.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "108a0aa7b8d86db2cbf116907e4144fd928a5599",
+      "bug_hypothesis": "Parameter behavior anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta; parameter changed response shape",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    },
+    {
+      "kind": "path",
+      "platform": "wordpress",
+      "url": "http://192.168.1.7/DVWA/vulnerabilities/xss_r/index.php",
+      "method": "GET",
+      "status": 200,
+      "length": 4748,
+      "content_type": "text/html;charset=utf-8",
+      "score": 18,
+      "reason": "status=200; different from 404 baseline; length delta",
+      "vulnerability_type": "Interesting path / response anomaly",
+      "conclusion": "Có dấu hiệu endpoint đáng chú ý dựa trên phản hồi server",
+      "parameter": "",
+      "param_type": "",
+      "payload_type": "",
+      "payload": "",
+      "evidence": "status=200; different from 404 baseline; length delta",
+      "marker": "",
+      "marker_reflected": false,
+      "marker_hits": [],
+      "confirmation": "possible",
+      "confirmation_reason": "Finding dựa trên response anomaly, chưa có marker xác nhận.",
+      "verification_pages": [],
+      "confirmation_level": "possible",
+      "confidence": 50,
+      "title": "Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA)",
+      "sha1": "dad048ef2a2ee0cd418c00465dc7b1082f14a6bd",
+      "bug_hypothesis": "Interesting path / response anomaly",
+      "evidence_summary": "status=200; different from 404 baseline; length delta",
+      "research_note": "Finding được sinh ra từ context-aware, feedback-based và marker-based verification."
+    }
+  ]
+}
